@@ -9,36 +9,44 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String playName = '';
   void _startGame() {
-    print('Start Game');
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => GameBoard(playerName: 'player1')),
+      MaterialPageRoute(builder: (context) => GameBoard(playerName: playName)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Zodiaco',
-            ),
-            TextField(
-              obscureText: false,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Enter your name',
+      appBar: AppBar(
+        title: Text('Zodiaco'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Zodiaco',
               ),
-            ),
-            ElevatedButton(
-              onPressed: _startGame,
-              child: Text('Start'),
-            ),
-          ],
+              TextField(
+                onChanged: (String val) async {
+                  playName = val;
+                },
+                obscureText: false,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter your name',
+                ),
+              ),
+              ElevatedButton(
+                onPressed: _startGame,
+                child: Text('Start'),
+              ),
+            ],
+          ),
         ),
       ),
     );
