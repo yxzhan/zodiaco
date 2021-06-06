@@ -39,7 +39,7 @@ class Cards extends StatelessWidget {
         (MediaQuery.of(context).size.height - AppBar().preferredSize.height) *
             0.1;
     // double cardWidth = MediaQuery.of(context).size.width * 0.12;
-    double cardWidth = cardHeight * 0.6;
+    double cardWidth = cardHeight * 0.71;
     List<Widget> res = [];
     for (var i = 0; i < _cardsRow.length; i++) {
       res.add(Container(

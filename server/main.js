@@ -16,14 +16,19 @@ var http = require('http');
 const https = require('https');
 const fs = require('fs');
 
-const options = {
-  key: fs.readFileSync('server/cert/key.pem'),
-  cert: fs.readFileSync('server/cert/cert.pem')
-};
+// const options = {
+//   key: fs.readFileSync('server/cert/key.pem'),
+//   cert: fs.readFileSync('server/cert/cert.pem')
+// };
 /**
  * HTTP server to implement WebSockets
  */
-var server = https.createServer(options, function (request, response) {
+// var server = https.createServer(options, function (request, response) {
+//   // Not important for us. We're writing WebSocket server,
+//   // not HTTP server
+// });
+
+var server = http.createServer(function (request, response) {
   // Not important for us. We're writing WebSocket server,
   // not HTTP server
 });
@@ -45,7 +50,7 @@ var wsServer = new webSocketServer({
 // This callback function is called every time someone
 // tries to connect to the WebSocket server
 wsServer.on('request', function (request) {
-  console.log(request)
+  console.log('new client')
   var connection = request.accept(null, request.origin);
 
   //
