@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
 import '../demo/GamePage.dart';
+import '../utils/Utils.dart';
 
 class StartPage extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends State<StartPage> {
   static final TextEditingController _name = new TextEditingController();
-  List<dynamic> playersList = <dynamic>[];
+  int playersListLength = 0;
   String gameState = '';
 
   @override
@@ -17,7 +18,7 @@ class _StartPageState extends State<StartPage> {
     super.initState();
 
     // Todos: save user name to Shared Preference or database for next play
-    _name.text = 'Zoooooooood';
+    _name.text = randomName();
 
     ///
     /// Ask to be notified when messages related to the game
@@ -51,7 +52,7 @@ class _StartPageState extends State<StartPage> {
       ///   * record the new list of players
       ///
       case "players_list":
-        playersList = message["data"];
+        playersListLength = message["data"];
         // force rebuild
         setState(() {});
         break;
@@ -85,6 +86,7 @@ class _StartPageState extends State<StartPage> {
       padding: const EdgeInsets.all(16.0),
       child: new Column(
         children: <Widget>[
+          // Text('Enter your name'),
           new TextField(
             controller: _name,
             keyboardType: TextInputType.text,
@@ -104,7 +106,7 @@ class _StartPageState extends State<StartPage> {
               child: new Text('Play'),
             ),
           ),
-          Text('Online Players: ' + playersList.length.toString())
+          Text('Online Players: ' + playersListLength.toString())
         ],
       ),
     );

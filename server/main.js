@@ -16,6 +16,15 @@ var http = require('http');
 const https = require('https');
 const fs = require('fs');
 
+const PLAYERSTATES = {
+  uninitialized: 0,
+  matching: 1,
+  ingame: 2,
+  over: 3
+}
+
+const MESSAGE = {}
+
 // const options = {
 //   key: fs.readFileSync('server/cert/key.pem'),
 //   cert: fs.readFileSync('server/cert/cert.pem')
@@ -65,10 +74,10 @@ wsServer.on('request', function (request) {
   //
   // We need to return the unique id of that player to the player itself
   //
-  connection.sendUTF(JSON.stringify({
+  player.sendMsg({
     action: 'connect',
     data: player.id
-  }));
+  });
 
   //
   // Inform other player to update online player number
@@ -93,10 +102,11 @@ wsServer.on('request', function (request) {
       //
       case 'join':
         player.name = message.data;
-        player.connection.sendUTF(JSON.stringify({
+        player.state = PLAYERSTATES.matching;
+        player.sendMsg({
           'action': 'matching_player'
-        }));
-
+        });
+        MatchPlayer();
         break;
         //
         // When a player resigns, we need to break the relationship
@@ -105,11 +115,9 @@ wsServer.on('request', function (request) {
         //
       case 'resign':
         console.log('resigned');
-        Players[player.opponentIndex]
-          .connection
-          .sendUTF(JSON.stringify({
-            'action': 'resigned'
-          }));
+        Players[player.opponentIndex].sendMsg({
+          'action': 'resigned'
+        });
 
         setTimeout(function () {
           Players[player.opponentIndex].opponentIndex = player.opponentIndex = null;
@@ -117,30 +125,13 @@ wsServer.on('request', function (request) {
         break;
 
         //
-        // A player initiates a new game.
-        // Let's create a relationship between the 2 players and
-        // notify the other player that a new game starts
-        //
-      case 'new_game':
-        player.setOpponent(message.data);
-        Players[player.opponentIndex]
-          .connection
-          .sendUTF(JSON.stringify({
-            'action': 'new_game',
-            'data': player.name
-          }));
-        break;
-
-        //
         // A player sends a move.  Let's forward the move to the other player
         //
       case 'play':
-        Players[player.opponentIndex]
-          .connection
-          .sendUTF(JSON.stringify({
-            'action': 'play',
-            'data': message.data
-          }));
+        Players[player.opponentIndex].sendMsg({
+          'action': 'play',
+          'data': message.data
+        });
         break;
     }
   });
@@ -148,7 +139,6 @@ wsServer.on('request', function (request) {
   // user disconnected
   connection.on('close', function (connection) {
     // We need to remove the corresponding player
-    // TODO
     console.log('Player left, id:', player.id)
     Players = Players.filter(function (obj) {
       return obj.id !== player.id;
@@ -164,10 +154,11 @@ var Players = [];
 
 function Player(id, connection) {
   this.id = id;
-  this.connection = connection;
+  this._connection = connection;
   this.name = "";
   this.opponentIndex = null;
   this.index = Players.length;
+  this.state = PLAYERSTATES.uninitialized;
 }
 
 Player.prototype = {
@@ -176,6 +167,9 @@ Player.prototype = {
       name: this.name,
       id: this.id
     };
+  },
+  sendMsg: function (msg) {
+    this._connection.sendUTF(JSON.stringify(msg))
   },
   setOpponent: function (id) {
     var self = this;
@@ -193,19 +187,36 @@ Player.prototype = {
 // Routine to broadcast the list of all players to everyone
 // ---------------------------------------------------------
 function BroadcastPlayersList() {
-  var playersList = [];
   Players.forEach(function (player) {
-    // if (player.name !== '') {
-    playersList.push(player.getId());
-    // }
+    player.sendMsg({
+      'action': 'players_list',
+      'data': Players.length
+    });
   });
+}
 
-  var message = JSON.stringify({
-    'action': 'players_list',
-    'data': playersList
-  });
+// ---------------------------------------------------------
+// Match players
+// ---------------------------------------------------------
+function MatchPlayer() {
+  let matchingList = Players.filter(player => player.state === PLAYERSTATES.matching).slice(0, 2)
+  if (matchingList.length != 2) return
 
-  Players.forEach(function (player) {
-    player.connection.sendUTF(message);
-  });
+  let firstPlayer = matchingList[0]
+  let secondPlayer = matchingList[1]
+
+  firstPlayer.state = PLAYERSTATES.ingame
+  secondPlayer.state = PLAYERSTATES.ingame
+
+  firstPlayer.setOpponent(secondPlayer.id)
+  secondPlayer.setOpponent(firstPlayer.id)
+
+  firstPlayer.sendMsg({
+    'action': 'new_game',
+    'data': secondPlayer.name
+  })
+  secondPlayer.sendMsg({
+    'action': 'new_game',
+    'data': firstPlayer.name
+  })
 }
