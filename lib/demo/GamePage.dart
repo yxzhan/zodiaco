@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
+import './components/Cards.dart';
+import '../networking/GameManager.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({
     Key key,
+    this.playerName,
     this.opponentName,
-    this.character,
   }) : super(key: key);
 
   ///
-  /// Name of the opponent
+  /// Name of the players
   ///
   final String opponentName;
-
-  ///
-  /// Character to be used by the player for his/her moves ("X" or "O")
-  ///
-  final String character;
+  final String playerName;
 
   @override
   _GamePageState createState() => _GamePageState();
 }
 
 class _GamePageState extends State<GamePage> {
-  ///
-  /// One game in terms of grid cells.
-  /// When the user plays, one of this cells is filled with "X" or "O"
-  ///
-  List<String> grid = <String>["", "", "", "", "", "", "", "", ""];
+  final GameManager gameManager = new GameManager();
 
   @override
   void initState() {
@@ -66,7 +60,7 @@ class _GamePageState extends State<GamePage> {
       ///
       case 'play':
         var data = (message["data"] as String).split(';');
-        grid[int.parse(data[0])] = data[1];
+        // grid[int.parse(data[0])] = data[1];
 
         // Force rebuild
         setState(() {});
@@ -79,85 +73,50 @@ class _GamePageState extends State<GamePage> {
   /// We need to send this notification to the other player
   /// Then, leave this screen
   /// ---------------------------------------------------------
-  _doResign() {
-    game.send('resign', '');
-    Navigator.of(context).pop();
-  }
+  // _doResign() {
+  //   game.send('resign', '');
+  //   Navigator.of(context).pop();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return new SafeArea(
-      top: false,
-      bottom: false,
-      child: new Scaffold(
-        appBar: new AppBar(
-            title: new Text('Game against: ${widget.opponentName}',
-                style: new TextStyle(fontSize: 16.0)),
-            actions: <Widget>[
-              new RaisedButton(
-                onPressed: _doResign,
-                child: new Text('Resign'),
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('GameBoard'),
+        ),
+        body: SafeArea(
+          child: Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Opponent: ' + widget.opponentName,
               ),
-            ]),
-        body: _buildBoard(),
-      ),
+              _buildGrid(),
+              Text(
+                'Your Name: ' + widget.playerName,
+              ),
+            ],
+          )),
+        ));
+  }
+
+  Widget _buildInstruction(String gameHints) {
+    return Container(
+      child: Text(gameHints),
     );
   }
 
-  /// --------------------------------------------------------
-  /// Builds the Game Board.
-  /// --------------------------------------------------------
-  Widget _buildBoard() {
-    return new SafeArea(
-      top: false,
-      bottom: false,
-      child: new GridView.builder(
-        gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-        ),
-        itemCount: 9,
-        itemBuilder: (BuildContext context, int index) {
-          return _gridItem(index);
-        },
-      ),
-    );
-  }
-
-  Widget _gridItem(int index) {
-    Color color = grid[index] == "X" ? Colors.blue : Colors.red;
-
-    return new InkWell(
-      onTap: () {
-        ///
-        /// The user taps a cell.
-        /// If the latter is empty, let's put this player's character
-        /// and notify the other player.
-        /// Repaint the board
-        ///
-        if (grid[index] == "") {
-          grid[index] = widget.character;
-
-          ///
-          /// To send a move, we provide the cell index
-          /// and the character of this player
-          ///
-          game.send('play', '$index;${widget.character}');
-
-          /// Force the board repaint
-          setState(() {});
-        }
-      },
-      child: new GridTile(
-        child: new Card(
-          child: new FittedBox(
-              fit: BoxFit.contain,
-              child: new Text(grid[index],
-                  style: new TextStyle(
-                    fontSize: 50.0,
-                    color: color,
-                  ))),
-        ),
-      ),
-    );
+  Widget _buildGrid() {
+    return Expanded(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Cards(cardList: gameManager.opponentsCard),
+        Cards(cardList: gameManager.allCardValue, cardColor: Colors.grey),
+        Cards(cardList: gameManager.myCard),
+      ],
+    ));
   }
 }

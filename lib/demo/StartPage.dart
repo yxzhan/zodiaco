@@ -11,6 +11,7 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   static final TextEditingController _name = new TextEditingController();
   int playersListLength = 0;
+  String playerName = '';
   String gameState = '';
 
   @override
@@ -65,12 +66,13 @@ class _StartPageState extends State<StartPage> {
       /// using the "O"
       ///
       case 'new_game':
+        gameState = '';
         Navigator.push(
             context,
             new MaterialPageRoute(
-              builder: (BuildContext context) => new GamePage(
+              builder: (BuildContext context) => GamePage(
+                playerName: playerName, // Name of the opponent
                 opponentName: message["data"], // Name of the opponent
-                character: 'O',
               ),
             ));
         break;
@@ -129,6 +131,7 @@ class _StartPageState extends State<StartPage> {
   /// --------------------------------------------------------------
   _onGameJoin() {
     game.send('join', _name.text);
+    playerName = _name.text;
     setState(() {});
   }
 
