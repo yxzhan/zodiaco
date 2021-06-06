@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens/MyHomePage.dart';
+import 'screens/GameBoard.dart';
+// import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/status.dart' as status;
 
 void main() {
   runApp(MyApp());
@@ -22,7 +26,8 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: GameBoard(playerName: 'JJ'),
+      // home: MyHomePage(),
     );
   }
 }
