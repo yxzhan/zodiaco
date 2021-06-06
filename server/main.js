@@ -50,7 +50,6 @@ var wsServer = new webSocketServer({
 // This callback function is called every time someone
 // tries to connect to the WebSocket server
 wsServer.on('request', function (request) {
-  console.log('new client')
   var connection = request.accept(null, request.origin);
 
   //
@@ -72,6 +71,12 @@ wsServer.on('request', function (request) {
   }));
 
   //
+  // Inform other player to update online player number
+  //
+  console.log('Player join, id:', player.id)
+  BroadcastPlayersList();
+
+  //
   // Listen to any message sent by that player
   //
   connection.on('message', function (data) {
@@ -88,9 +93,11 @@ wsServer.on('request', function (request) {
       //
       case 'join':
         player.name = message.data;
-        BroadcastPlayersList();
-        break;
+        player.connection.sendUTF(JSON.stringify({
+          'action': 'matching_player'
+        }));
 
+        break;
         //
         // When a player resigns, we need to break the relationship
         // between the 2 players and notify the other player
@@ -142,6 +149,11 @@ wsServer.on('request', function (request) {
   connection.on('close', function (connection) {
     // We need to remove the corresponding player
     // TODO
+    console.log('Player left, id:', player.id)
+    Players = Players.filter(function (obj) {
+      return obj.id !== player.id;
+    });
+    BroadcastPlayersList();
   });
 });
 
@@ -183,9 +195,9 @@ Player.prototype = {
 function BroadcastPlayersList() {
   var playersList = [];
   Players.forEach(function (player) {
-    if (player.name !== '') {
-      playersList.push(player.getId());
-    }
+    // if (player.name !== '') {
+    playersList.push(player.getId());
+    // }
   });
 
   var message = JSON.stringify({

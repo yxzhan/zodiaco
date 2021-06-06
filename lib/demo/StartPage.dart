@@ -9,12 +9,15 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends State<StartPage> {
   static final TextEditingController _name = new TextEditingController();
-  String playerName;
   List<dynamic> playersList = <dynamic>[];
+  String gameState = '';
 
   @override
   void initState() {
     super.initState();
+
+    // Todos: save user name to Shared Preference or database for next play
+    _name.text = 'Zoooooooood';
 
     ///
     /// Ask to be notified when messages related to the game
@@ -36,16 +39,19 @@ class _StartPageState extends State<StartPage> {
   ///  - new_game
   /// -------------------------------------------------------------------
   _onGameDataReceived(message) {
+    print(message);
     switch (message["action"]) {
+      case "matching_player":
+        gameState = message["action"];
+        setState(() {});
+        break;
 
       ///
       /// Each time a new player joins, we need to
       ///   * record the new list of players
-      ///   * rebuild the list of all the players
       ///
       case "players_list":
         playersList = message["data"];
-
         // force rebuild
         setState(() {});
         break;
@@ -75,9 +81,6 @@ class _StartPageState extends State<StartPage> {
   /// his/her name and join the list of players
   /// -----------------------------------------------------------
   Widget _buildJoin() {
-    if (game.playerName != "") {
-      return new Container();
-    }
     return new Container(
       padding: const EdgeInsets.all(16.0),
       child: new Column(
@@ -96,102 +99,53 @@ class _StartPageState extends State<StartPage> {
           ),
           new Padding(
             padding: const EdgeInsets.all(8.0),
-            child: new RaisedButton(
+            child: new ElevatedButton(
               onPressed: _onGameJoin,
-              child: new Text('Join...'),
+              child: new Text('Play'),
             ),
           ),
+          Text('Online Players: ' + playersList.length.toString())
         ],
       ),
     );
   }
 
-  /// ------------------------------------------------------
-  /// The user wants to join, so let's send his/her name
-  /// As the user has a name, we may now show the other players
-  /// ------------------------------------------------------
-  _onGameJoin() {
-    game.send('join', _name.text);
-
-    /// Force a rebuild
-    setState(() {});
-  }
-
-  /// ------------------------------------------------------
-  /// Builds the list of players
-  /// ------------------------------------------------------
-  Widget _playersList() {
-    ///
-    /// If the user has not yet joined, do not display
-    /// the list of players
-    ///
-    if (game.playerName == "") {
-      return new Container();
-    }
-
-    ///
-    /// Display the list of players.
-    /// For each of them, put a Button that could be used
-    /// to launch a new game
-    ///
-    List<Widget> children = playersList.map((playerInfo) {
-      return new ListTile(
-        title: new Text(playerInfo["name"]),
-        trailing: new RaisedButton(
-          onPressed: () {
-            _onPlayGame(playerInfo["name"], playerInfo["id"]);
-          },
-          child: new Text('Play'),
-        ),
-      );
-    }).toList();
-
-    return new Column(
-      children: children,
+  Widget _buildMatching() {
+    return Center(
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('Welcome ' + game.playerName + ' !'),
+            Text('Matching Player...')
+          ]),
     );
   }
 
   /// --------------------------------------------------------------
   /// We launch a new Game, we need to:
-  ///    * send the action "new_game", together with the ID
-  ///      of the opponent we choosed
-  ///    * redirect to the game board
-  ///      As we are the game initiator, we will play with the "X"
+  ///    * send the action "join"
   /// --------------------------------------------------------------
-  _onPlayGame(String opponentName, String opponentId) {
-    // We need to send the opponentId to initiate a new game
-    game.send('new_game', opponentId);
-
-    Navigator.push(
-        context,
-        new MaterialPageRoute(
-          builder: (BuildContext context) => new GamePage(
-            opponentName: opponentName,
-            character: 'X',
-          ),
-        ));
+  _onGameJoin() {
+    game.send('join', _name.text);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget mainUI;
+    if (gameState != 'matching_player') {
+      mainUI = _buildJoin();
+    } else {
+      mainUI = _buildMatching();
+    }
     return new SafeArea(
       bottom: false,
       top: false,
       child: Scaffold(
-        appBar: new AppBar(
-          title: new Text('TicTacToe'),
-        ),
-        body: SingleChildScrollView(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              _buildJoin(),
-              new Text('List of players:'),
-              _playersList(),
-            ],
+          appBar: new AppBar(
+            title: new Text('Zodiaco'),
           ),
-        ),
-      ),
+          body: mainUI),
     );
   }
 }
