@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'GameBoard.dart';
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+class StartPage extends StatefulWidget {
+  StartPage({Key key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _StartPageState createState() => _StartPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _StartPageState extends State<StartPage> {
   String playName = '';
   void _startGame() {
     Navigator.push(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/MyHomePage.dart';
+import 'screens/StartPage.dart';
 import 'screens/GameBoard.dart';
 
 void main() {
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: GameBoard(playerName: 'JJ'),
-      // home: MyHomePage(),
+      // home: StartPage(),
     );
   }
 }
