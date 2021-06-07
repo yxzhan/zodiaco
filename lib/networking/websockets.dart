@@ -56,13 +56,26 @@ class WebSocketsNotifications {
       ///
       /// Start listening to new notifications / messages
       ///
-      _channel.stream.listen(_onReceptionOfMessageFromServer);
+      _channel.stream.listen(_onReceptionOfMessageFromServer, onDone: () {
+        _reConnect();
+      });
     } catch (e) {
       ///
       /// General error handling
       /// TODO
       ///
+      print(e);
     }
+  }
+
+  /// ----------------------------------------------------------
+  /// Closes the WebSocket communication
+  /// ----------------------------------------------------------
+  _reConnect() {
+    Future.delayed(Duration(milliseconds: 1000)).then((_) {
+      reset();
+      initCommunication();
+    });
   }
 
   /// ----------------------------------------------------------
