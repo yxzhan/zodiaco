@@ -4,9 +4,15 @@ A new Flutter project.
 
 ## Getting Started
 
-#### Install npm dependencies
+### Server Setup
+
+#### 1. Install Nodejs
+
+https://nodejs.org/en/download/
+
+#### 2. Install npm dependencies
 `npm i`
-#### Run websocket server
+#### 3. Run websocket server
 `npm run start`
 
 

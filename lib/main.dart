@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'screens/StartPage.dart';
-import 'screens/GameBoard.dart';
 import 'demo/StartPage.dart';
 
 void main() {
