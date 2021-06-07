@@ -133,10 +133,11 @@ wsServer.on('request', function (request) {
         // A player sends a move.  Let's forward the move to the other player
         //
       case 'play':
-        Players[player.opponentIndex].sendMsg({
-          'action': 'play',
-          'data': message.data
-        });
+        // Players[player.opponentIndex].sendMsg({
+        //   'action': 'play',
+        //   'data': message.data
+        // });
+        checkGuess(player, message.data)
         break;
     }
   });
@@ -164,6 +165,7 @@ function Player(id, connection) {
   this.opponentIndex = null;
   this.index = Players.length;
   this.state = PLAYERSTATES.uninitialized;
+  this.cards = [];
 }
 
 Player.prototype = {
@@ -227,7 +229,7 @@ function MatchPlayer() {
 }
 
 // ---------------------------------------------------------
-// Match players
+// Deal cards
 // ---------------------------------------------------------
 function DealCards(player) {
   let opponent = Players[player.opponentIndex]
@@ -243,25 +245,56 @@ function DealCards(player) {
   let cards1 = allCardsVal.slice(0, splitSize).sort((v, v2) => v - v2)
   let cards2 = allCardsVal.slice(splitSize, splitSize * 2).sort((v, v2) => v - v2)
 
-  player.sendMsg({
-    'action': 'deal',
-    'data': {
-      'myCard': cards1,
-      'opponentsCard': cards2
+  player.cards = cards1.map(v => {
+    return {
+      show: 0,
+      value: v
     }
   })
 
-  opponent.sendMsg({
-    'action': 'deal',
+  opponent.cards = cards2.map(v => {
+    return {
+      show: 0,
+      value: v
+    }
+  })
+  updateCards(player)
+}
+
+// ---------------------------------------------------------
+// Check guess result
+// ---------------------------------------------------------
+function checkGuess(player, data) {
+  let opponent = Players[player.opponentIndex]
+  let index = parseInt(data.split(',')[0])
+  let guessNum = parseInt(data.split(',')[1])
+  if (guessNum == opponent.cards[index]['value']) {
+    opponent.cards[index]['show'] = 1
+    updateCards(player)
+  }
+}
+
+function updateCards(player) {
+  let opponent = Players[player.opponentIndex]
+  player.sendMsg({
+    'action': 'cards_update',
     'data': {
-      'myCard': cards2,
-      'opponentsCard': cards1
+      'myCard': player.cards,
+      'opponentsCard': opponent.cards
+    }
+  })
+  opponent.sendMsg({
+    'action': 'cards_update',
+    'data': {
+      'myCard': opponent.cards,
+      'opponentsCard': player.cards
     }
   })
 }
-// DealCards()
 
-
+// ---------------------------------------------------------
+// Shuffle array helper function
+// ---------------------------------------------------------
 function _shuffle(array) {
   var currentIndex = array.length,
     randomIndex;

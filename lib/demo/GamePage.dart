@@ -20,9 +20,8 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  final List<int> allCardValue = [for (var i = 0; i < 10; i += 1) i];
-  List<int> opponentsCard = [for (var i = 0; i < 10; i += 1) 0];
-  List<int> myCard = [for (var i = 0; i < 10; i += 1) 0];
+  List<dynamic> opponentsCard = [];
+  List<dynamic> myCard = [];
 
   @override
   void initState() {
@@ -61,11 +60,12 @@ class _GamePageState extends State<GamePage> {
       /// The opponent played a move.
       /// So record it and rebuild the board
       ///
-      case 'deal':
+      case 'cards_update':
         print(message["data"]);
         // List<List<int>> _data = new List<List<int>>.from(message["data"]);
-        opponentsCard = new List<int>.from(message["data"]['opponentsCard']);
-        myCard = new List<int>.from(message["data"]['myCard']);
+        opponentsCard =
+            new List<dynamic>.from(message["data"]['opponentsCard']);
+        myCard = new List<dynamic>.from(message["data"]['myCard']);
         setState(() {});
         break;
 
@@ -73,13 +73,13 @@ class _GamePageState extends State<GamePage> {
       /// The opponent played a move.
       /// So record it and rebuild the board
       ///
-      case 'play':
-        // var data = (message["data"] as String).split(';');
-        // grid[int.parse(data[0])] = data[1];
+      // case 'play':
+      //   // var data = (message["data"] as String).split(';');
+      //   // grid[int.parse(data[0])] = data[1];
 
-        // Force rebuild
-        setState(() {});
-        break;
+      //   // Force rebuild
+      //   setState(() {});
+      //   break;
 
       case 'gameover':
         // var data = (message["data"] as String).split(';');
@@ -102,12 +102,24 @@ class _GamePageState extends State<GamePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'Opponent: ' + widget.opponentName,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.person),
+                  Text(
+                    widget.opponentName,
+                  )
+                ],
               ),
               _buildCards(),
-              Text(
-                'Your Name: ' + widget.playerName,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.person),
+                  Text(
+                    widget.playerName,
+                  )
+                ],
               ),
             ],
           )),
@@ -123,11 +135,14 @@ class _GamePageState extends State<GamePage> {
   Widget _buildCards() {
     return Expanded(
         child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Cards(cardList: opponentsCard, cardColor: Colors.green),
-        Cards(cardList: allCardValue, cardColor: Colors.grey),
-        Cards(cardList: myCard),
+        Cards(cardList: opponentsCard),
+        // Cards(cardList: allCardValue, cardColor: Colors.grey),
+        Cards(
+          cardList: myCard,
+          isMyCard: true,
+        ),
       ],
     ));
   }
