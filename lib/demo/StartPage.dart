@@ -67,6 +67,7 @@ class _StartPageState extends State<StartPage> {
       ///
       case 'new_game':
         gameState = '';
+        setState(() {});
         Navigator.push(
             context,
             new MaterialPageRoute(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
 import './components/Cards.dart';
-import '../networking/GameManager.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({
@@ -21,7 +20,9 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  final GameManager gameManager = new GameManager();
+  final List<int> allCardValue = [for (var i = 0; i < 10; i += 1) i];
+  List<int> opponentsCard = [for (var i = 0; i < 10; i += 1) 0];
+  List<int> myCard = [for (var i = 0; i < 10; i += 1) 0];
 
   @override
   void initState() {
@@ -32,10 +33,12 @@ class _GamePageState extends State<GamePage> {
     /// comes in.
     ///
     game.addListener(_onAction);
+    game.send('ready', '');
   }
 
   @override
   void dispose() {
+    game.send('resign', '');
     game.removeListener(_onAction);
     super.dispose();
   }
@@ -58,25 +61,34 @@ class _GamePageState extends State<GamePage> {
       /// The opponent played a move.
       /// So record it and rebuild the board
       ///
+      case 'deal':
+        print(message["data"]);
+        // List<List<int>> _data = new List<List<int>>.from(message["data"]);
+        opponentsCard = new List<int>.from(message["data"]['opponentsCard']);
+        myCard = new List<int>.from(message["data"]['myCard']);
+        setState(() {});
+        break;
+
+      ///
+      /// The opponent played a move.
+      /// So record it and rebuild the board
+      ///
       case 'play':
-        var data = (message["data"] as String).split(';');
+        // var data = (message["data"] as String).split(';');
         // grid[int.parse(data[0])] = data[1];
 
         // Force rebuild
         setState(() {});
         break;
+
+      case 'gameover':
+        // var data = (message["data"] as String).split(';');
+        // grid[int.parse(data[0])] = data[1];
+        // Force rebuild
+        setState(() {});
+        break;
     }
   }
-
-  /// ---------------------------------------------------------
-  /// This player resigns
-  /// We need to send this notification to the other player
-  /// Then, leave this screen
-  /// ---------------------------------------------------------
-  // _doResign() {
-  //   game.send('resign', '');
-  //   Navigator.of(context).pop();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +105,7 @@ class _GamePageState extends State<GamePage> {
               Text(
                 'Opponent: ' + widget.opponentName,
               ),
-              _buildGrid(),
+              _buildCards(),
               Text(
                 'Your Name: ' + widget.playerName,
               ),
@@ -108,14 +120,14 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Widget _buildGrid() {
+  Widget _buildCards() {
     return Expanded(
         child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        Cards(cardList: gameManager.opponentsCard),
-        Cards(cardList: gameManager.allCardValue, cardColor: Colors.grey),
-        Cards(cardList: gameManager.myCard),
+        Cards(cardList: opponentsCard, cardColor: Colors.green),
+        Cards(cardList: allCardValue, cardColor: Colors.grey),
+        Cards(cardList: myCard),
       ],
     ));
   }

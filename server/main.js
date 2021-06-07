@@ -19,8 +19,11 @@ const fs = require('fs');
 const PLAYERSTATES = {
   uninitialized: 0,
   matching: 1,
-  ingame: 2,
-  over: 3
+  matched: 2,
+  ready: 3,
+  playing: 4,
+  waiting: 5,
+  over: 6
 }
 
 const MESSAGE = {}
@@ -108,6 +111,11 @@ wsServer.on('request', function (request) {
         });
         MatchPlayer();
         break;
+
+      case 'ready':
+        player.state = PLAYERSTATES.ready;
+        DealCards(player);
+        break;
         //
         // When a player resigns, we need to break the relationship
         // between the 2 players and notify the other player
@@ -118,10 +126,7 @@ wsServer.on('request', function (request) {
         Players[player.opponentIndex].sendMsg({
           'action': 'resigned'
         });
-
-        setTimeout(function () {
-          Players[player.opponentIndex].opponentIndex = player.opponentIndex = null;
-        }, 0);
+        player.opponentIndex = null;
         break;
 
         //
@@ -205,8 +210,8 @@ function MatchPlayer() {
   let firstPlayer = matchingList[0]
   let secondPlayer = matchingList[1]
 
-  firstPlayer.state = PLAYERSTATES.ingame
-  secondPlayer.state = PLAYERSTATES.ingame
+  firstPlayer.state = PLAYERSTATES.matched
+  secondPlayer.state = PLAYERSTATES.matched
 
   firstPlayer.setOpponent(secondPlayer.id)
   secondPlayer.setOpponent(firstPlayer.id)
@@ -219,4 +224,60 @@ function MatchPlayer() {
     'action': 'new_game',
     'data': firstPlayer.name
   })
+}
+
+// ---------------------------------------------------------
+// Match players
+// ---------------------------------------------------------
+function DealCards(player) {
+  let opponent = Players[player.opponentIndex]
+  // wait until opponent ready
+  if (opponent.state != PLAYERSTATES.ready) return
+  const maxValue = 12
+  const splitSize = 10
+  // Generate cards
+  let allCardsVal = Array.from(Array(maxValue).keys()).map(v => v + 1)
+  allCardsVal = _shuffle(allCardsVal.concat(allCardsVal))
+
+  // sort cards according to values
+  let cards1 = allCardsVal.slice(0, splitSize).sort((v, v2) => v - v2)
+  let cards2 = allCardsVal.slice(splitSize, splitSize * 2).sort((v, v2) => v - v2)
+
+  player.sendMsg({
+    'action': 'deal',
+    'data': {
+      'myCard': cards1,
+      'opponentsCard': cards2
+    }
+  })
+
+  opponent.sendMsg({
+    'action': 'deal',
+    'data': {
+      'myCard': cards2,
+      'opponentsCard': cards1
+    }
+  })
+}
+// DealCards()
+
+
+function _shuffle(array) {
+  var currentIndex = array.length,
+    randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]
+    ];
+  }
+
+  return array;
 }
