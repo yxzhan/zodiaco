@@ -15,52 +15,36 @@ class Cards extends StatelessWidget {
   final bool isMyCard;
   final Function(int, bool) onTap;
   final int selectedCard;
-  int rowSize = 0;
 
   @override
   Widget build(BuildContext context) {
-    const rowMargin = EdgeInsets.symmetric(vertical: 8.0);
-    rowSize = (cardList.length ~/ 2).toInt();
-    var row1 = cardList.sublist(0, rowSize);
-    var row2 = cardList.sublist(rowSize);
-    return Column(children: <Widget>[
-      Container(
-        margin: rowMargin,
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: _cardRow(context, row1, 1)),
-      ),
-      Container(
-        margin: rowMargin,
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: _cardRow(context, row2, 2)),
-      ),
-    ]);
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 16.0,
+      children: _buildCards(context),
+    );
   }
 
-  List<Widget> _cardRow(
-      BuildContext context, List<dynamic> _cardsRow, int rowIndex) {
-    double cardHeight =
-        (MediaQuery.of(context).size.height - AppBar().preferredSize.height) *
-            0.09;
-    double cardWidth = cardHeight * 0.71;
+  List<Widget> _buildCards(BuildContext context) {
+    double cardWidth = MediaQuery.of(context).size.width * 0.12;
+    double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
-    for (var i = 0; i < _cardsRow.length; i++) {
+    for (var i = 0; i < cardList.length; i++) {
       String cardNum = '';
       Widget cardElement;
-      double cardRotation = 0.7;
+      double cardRotation = 0.8;
       Color borderColor = Colors.black;
-      int originIndex = i + (rowIndex - 1) * rowSize;
+      double borderWidth = 2;
 
-      if (_cardsRow[i]['show'] == 1) {
+      if (cardList[i]['show'] == 1) {
         cardRotation = 0;
       }
-      if (_cardsRow[i]['show'] == 1 || isMyCard) {
-        cardNum = _cardsRow[i]['value'].toString();
+      if (cardList[i]['show'] == 1 || isMyCard) {
+        cardNum = cardList[i]['value'].toString();
       }
-      if (selectedCard == originIndex) {
+      if (selectedCard == i) {
         borderColor = Colors.red;
+        borderWidth = 4;
       }
       cardElement = Transform(
           alignment: Alignment.center,
@@ -68,15 +52,19 @@ class Cards extends StatelessWidget {
             ..setEntry(3, 2, 0.01)
             ..rotateX(cardRotation),
           child: GestureDetector(
-              onTap: () => {onTap(originIndex, isMyCard)},
+              onTap: () => {onTap(i, isMyCard)},
               child: Container(
                 width: cardWidth,
                 height: cardHeight,
-                decoration:
-                    BoxDecoration(border: Border.all(color: borderColor)),
+                decoration: BoxDecoration(
+                    border: Border.all(color: borderColor, width: borderWidth)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 // color: cardColor,
-                child: Center(child: Text(cardNum)),
+                child: Center(
+                    child: Text(
+                  cardNum,
+                  style: TextStyle(fontSize: 24),
+                )),
               )));
       res.add(cardElement);
     }

@@ -129,7 +129,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void sendGuess(int guessNum) {
-    if (!isMyTurn) return;
+    if (!isMyTurn || isPunishing) return;
     game.send('play', '${selfSelectedCard},${guessNum}');
     // selfSelectedCard = -1;
     // setState(() {});

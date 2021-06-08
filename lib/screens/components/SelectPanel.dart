@@ -3,48 +3,40 @@ import 'package:flutter/material.dart';
 class SelectPanel extends StatelessWidget {
   SelectPanel({Key key, this.callback}) : super(key: key);
   final Function(int) callback;
+  final List<dynamic> allCardValue = [for (var i = 1; i < 13; i += 1) i];
 
   @override
   Widget build(BuildContext context) {
-    final List<dynamic> allCardValue = [for (var i = 1; i < 13; i += 1) i];
-    int rowSize = (allCardValue.length ~/ 2).toInt();
-    var row1 = allCardValue.sublist(0, rowSize);
-    var row2 = allCardValue.sublist(rowSize);
-    const rowMargin = EdgeInsets.symmetric(vertical: 8.0);
     return Container(
         decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-        child: Column(children: <Widget>[
-          Container(
-            margin: rowMargin,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _cardRow(context, row1)),
-          ),
-          Container(
-            margin: rowMargin,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _cardRow(context, row2)),
-          ),
-        ]));
+        child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+            child: Wrap(
+              spacing: 0,
+              runSpacing: 16,
+              children: _buildCards(context),
+            )));
   }
 
-  List<Widget> _cardRow(BuildContext context, List<dynamic> _cardsRow) {
-    double cardHeight =
-        (MediaQuery.of(context).size.height - AppBar().preferredSize.height) *
-            0.08;
-    double cardWidth = cardHeight * 0.71;
+  List<Widget> _buildCards(BuildContext context) {
+    double cardWidth = MediaQuery.of(context).size.width * 0.12;
+    double cardHeight = cardWidth * 1.2;
     List<Widget> res = [];
-    for (var i = 0; i < _cardsRow.length; i++) {
+    for (var i = 0; i < allCardValue.length; i++) {
       Widget cardElement;
       cardElement = GestureDetector(
-          onTap: () => {callback(_cardsRow[i])},
+          onTap: () => {callback(allCardValue[i])},
           child: Container(
             width: cardWidth,
             height: cardHeight,
-            decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 2)),
             margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Center(child: Text(_cardsRow[i].toString())),
+            child: Center(
+                child: Text(
+              allCardValue[i].toString(),
+              style: TextStyle(fontSize: 20),
+            )),
           ));
       res.add(cardElement);
     }
