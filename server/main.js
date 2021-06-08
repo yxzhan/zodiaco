@@ -13,8 +13,8 @@ var webSocketsServerPort = 23456; // Adapt to the listening port number you want
 // websocket and http servers
 var webSocketServer = require('websocket').server;
 var http = require('http');
-const https = require('https');
-const fs = require('fs');
+// const https = require('https');
+// const fs = require('fs');
 
 const PLAYERSTATES = {
   uninitialized: 0,
@@ -32,14 +32,15 @@ const MESSAGE = {}
 //   key: fs.readFileSync('server/cert/key.pem'),
 //   cert: fs.readFileSync('server/cert/cert.pem')
 // };
-/**
- * HTTP server to implement WebSockets
- */
+
 // var server = https.createServer(options, function (request, response) {
 //   // Not important for us. We're writing WebSocket server,
 //   // not HTTP server
 // });
 
+/**
+ * HTTP server to implement WebSockets
+ */
 var server = http.createServer(function (request, response) {
   // Not important for us. We're writing WebSocket server,
   // not HTTP server
@@ -135,6 +136,7 @@ wsServer.on('request', function (request) {
         //
       case 'play':
         checkGuess(player, message.data)
+        checkGameover(player)
         break;
         //
         // A player select a opponent's card
@@ -150,12 +152,14 @@ wsServer.on('request', function (request) {
         //
       case 'punish':
         punish(player, message.data)
+        checkGameover(player)
         break;
         //
         // A player takes punishment
         //
       case 'skip':
         // punish(player, message.data)
+        switchTurn(player, false)
 
         break;
     }
@@ -279,6 +283,80 @@ function DealCards(player) {
   })
   updateCards(player)
   console.log('New Game')
+  switchTurn(player, Math.random() > 0.5)
+}
+
+// ---------------------------------------------------------
+// Check if game is over
+// ---------------------------------------------------------
+function checkGameover(player) {
+  let opponent = Players[player.opponentIndex]
+  // check if one of the player's cards are all unfolded
+  if (_isAllCardsUnfolded(player.cards)) {
+    _sendResultMsg(opponent)
+    _sendGameoverMsg()
+  }
+
+  if (_isAllCardsUnfolded(opponent.cards)) {
+    _sendResultMsg(player)
+    _sendGameoverMsg()
+  }
+
+  function _sendGameoverMsg() {
+    player.sendMsg({
+      'action': 'gameover'
+    })
+    opponent.sendMsg({
+      'action': 'gameover'
+    })
+  }
+
+  function _sendResultMsg(winner) {
+    winner.sendMsg({
+      'action': 'hint_update',
+      'data': 'You win!'
+    })
+    Players[winner.opponentIndex].sendMsg({
+      'action': 'hint_update',
+      'data': 'You lost!'
+    })
+  }
+
+  function _isAllCardsUnfolded(arr) {
+    return arr.map(v => v.show).reduce((a, b) => a + b) == arr.length
+  }
+}
+
+// ---------------------------------------------------------
+// Check guess result
+// ---------------------------------------------------------
+function switchTurn(player, turn) {
+  let opponent = Players[player.opponentIndex]
+  let turnHint = 'Your turn! Click opponent\'s card and guess the number.'
+  let waitHint = '\'s turn.'
+  player.sendMsg({
+    'action': 'switch_turn',
+    'data': turn
+  })
+  opponent.sendMsg({
+    'action': 'switch_turn',
+    'data': !turn
+  })
+
+  player.sendMsg({
+    'action': 'hint_update',
+    'data': turn ? turnHint : opponent.name + waitHint
+  })
+  opponent.sendMsg({
+    'action': 'hint_update',
+    'data': turn ? player.name + waitHint : turnHint
+  })
+
+  Players[player.opponentIndex].sendMsg({
+    'action': 'select_card',
+    'data': '-1'
+  });
+  console.log(`${turn ? player.name: opponent.name}\'s turn.`)
 }
 
 // ---------------------------------------------------------
@@ -304,6 +382,14 @@ function checkGuess(player, data) {
       'action': 'hint_update',
       'data': 'Guessed wrong! Turn over one of your card.'
     })
+
+    player.sendMsg({
+      'action': 'punish'
+    })
+    player.sendMsg({
+      'action': 'show_skip',
+      'data': false
+    })
   }
 }
 
@@ -315,10 +401,11 @@ function punish(player, data) {
   let index = parseInt(data)
   player.cards[index]['show'] = 1
   updateCards(player)
+  switchTurn(player, false)
 }
 
 // ---------------------------------------------------------
-// Update card display state
+// Update cards display state
 // ---------------------------------------------------------
 function updateCards(player) {
   let opponent = Players[player.opponentIndex]

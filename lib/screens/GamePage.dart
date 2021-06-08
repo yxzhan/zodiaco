@@ -26,9 +26,10 @@ class _GamePageState extends State<GamePage> {
   String gameHints = '';
   int opponentSelectedCard = -1;
   int selfSelectedCard = -1;
-  bool isMyTurn = true;
+  bool isMyTurn = false;
   bool showSkipButton = false;
-
+  bool showRestartButton = false;
+  bool isPunishing = false;
   @override
   void initState() {
     super.initState();
@@ -70,11 +71,15 @@ class _GamePageState extends State<GamePage> {
         opponentsCard =
             new List<dynamic>.from(message["data"]['opponentsCard']);
         myCard = new List<dynamic>.from(message["data"]['myCard']);
+        showRestartButton = false;
         setState(() {});
         break;
 
       case 'switch_turn':
         isMyTurn = message["data"];
+        isPunishing = false;
+        selfSelectedCard = -1;
+        setState(() {});
         break;
 
       case 'select_card':
@@ -89,22 +94,21 @@ class _GamePageState extends State<GamePage> {
 
       case 'show_skip':
         showSkipButton = message["data"];
+        if (showSkipButton) {
+          selfSelectedCard = -1;
+        }
         setState(() {});
         break;
 
-      ///
-      /// The opponent played a move.
-      /// So record it and rebuild the board
-      ///
-      // case 'play':
-      //   // var data = (message["data"] as String).split(';');
-      //   // grid[int.parse(data[0])] = data[1];
-
-      //   // Force rebuild
-      //   setState(() {});
-      //   break;
+      case 'punish':
+        isPunishing = true;
+        break;
 
       case 'gameover':
+        print('gameover');
+        selfSelectedCard = -1;
+        showSkipButton = false;
+        showRestartButton = true;
         setState(() {});
         break;
     }
@@ -114,12 +118,12 @@ class _GamePageState extends State<GamePage> {
     if (!isMyTurn) return;
 
     if (!isMyCard) {
-      if (opponentsCard[index]['show'] == 1) return;
+      if (opponentsCard[index]['show'] == 1 || isPunishing) return;
       selfSelectedCard = selfSelectedCard != index ? index : -1;
       setState(() {});
 
       game.send('select_card', '${selfSelectedCard}');
-    } else {
+    } else if (isPunishing) {
       game.send('punish', '${index}');
     }
   }
@@ -127,14 +131,19 @@ class _GamePageState extends State<GamePage> {
   void sendGuess(int guessNum) {
     if (!isMyTurn) return;
     game.send('play', '${selfSelectedCard},${guessNum}');
-    selfSelectedCard = -1;
-    setState(() {});
+    // selfSelectedCard = -1;
+    // setState(() {});
   }
 
   void skipRound() {
     game.send('skip', '');
     selfSelectedCard = -1;
+    showSkipButton = false;
     setState(() {});
+  }
+
+  void restartGame() {
+    game.send('ready', '');
   }
 
   @override
@@ -149,37 +158,78 @@ class _GamePageState extends State<GamePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.person),
-                  Text(
-                    widget.opponentName,
-                  )
-                ],
-              ),
-              _buildCards(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.person),
-                  Text(
-                    widget.playerName,
-                  )
-                ],
-              ),
+              _buildPlayerInfo(widget.opponentName, !isMyTurn),
+              _buildGameBoard(),
+              _buildPlayerInfo(widget.playerName, isMyTurn)
             ],
           )),
         ));
   }
 
-  Widget _buildInstruction() {
-    return Container(
-      child: Text(gameHints),
+  Widget _buildPlayerInfo(String name, bool isPlaying) {
+    Widget playingSign = Container();
+    if (isPlaying) {
+      // playingSign = LoadingCircle(
+      //   size: 10.0,
+      //   duration: 2,
+      // );
+      playingSign = Text('\'s turn.');
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.person),
+        Text(
+          name,
+        ),
+        playingSign
+      ],
     );
   }
 
-  Widget _buildSkip() {
+  Widget _buildGameBoard() {
+    return Expanded(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Cards(
+          cardList: opponentsCard,
+          onTap: onCardTap,
+          selectedCard: selfSelectedCard,
+          isMyCard: false,
+        ),
+        _buildSelectPanel(),
+        _buildInstruction(),
+        _buildButtons(),
+        Cards(
+          cardList: myCard,
+          onTap: onCardTap,
+          selectedCard: opponentSelectedCard,
+          isMyCard: true,
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildInstruction() {
+    return Container(
+        child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+      child: Text(
+        gameHints,
+        textAlign: TextAlign.center,
+      ),
+    ));
+  }
+
+  Widget _buildButtons() {
+    if (showRestartButton) {
+      return Container(
+          child: ElevatedButton(
+        onPressed: restartGame,
+        child: new Text('Restart'),
+      ));
+    }
     if (!showSkipButton) {
       return Container();
     }
@@ -195,29 +245,5 @@ class _GamePageState extends State<GamePage> {
       return Container();
     }
     return SelectPanel(callback: sendGuess);
-  }
-
-  Widget _buildCards() {
-    return Expanded(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Cards(
-          cardList: opponentsCard,
-          onTap: onCardTap,
-          selectedCard: selfSelectedCard,
-          isMyCard: false,
-        ),
-        _buildSelectPanel(),
-        _buildInstruction(),
-        _buildSkip(),
-        Cards(
-          cardList: myCard,
-          onTap: onCardTap,
-          selectedCard: opponentSelectedCard,
-          isMyCard: true,
-        ),
-      ],
-    ));
   }
 }
