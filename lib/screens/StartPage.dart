@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
 import './GamePage.dart';
 import '../utils/Utils.dart';
+import './components/LoadingCircle.dart';
 
 class StartPage extends StatefulWidget {
   @override
@@ -74,6 +75,11 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
+  void cancelMatching() {
+    gameState = '';
+    setState(() {});
+  }
+
   /// -----------------------------------------------------------
   /// If the user has not yet joined, let the user enter
   /// his/her name and join the list of players
@@ -114,8 +120,18 @@ class _StartPageState extends State<StartPage> {
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Welcome ' + game.playerName + ' !'),
-            Text('Matching Player...')
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: LoadingCircle(),
+            ),
+            Text('Welcome ' + game.playerName),
+            Text('Matching Player...'),
+            Padding(
+                padding: const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: cancelMatching,
+                  child: new Text('Cancel'),
+                )),
           ]),
     );
   }
