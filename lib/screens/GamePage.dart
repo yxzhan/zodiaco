@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
 import './components/Cards.dart';
+import './components/SelectPanel.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({
@@ -22,6 +23,11 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   List<dynamic> opponentsCard = [];
   List<dynamic> myCard = [];
+  String gameHints = '';
+  int opponentSelectedCard = -1;
+  int selfSelectedCard = -1;
+  bool isMyTurn = true;
+  bool showSkipButton = false;
 
   @override
   void initState() {
@@ -61,11 +67,28 @@ class _GamePageState extends State<GamePage> {
       /// So record it and rebuild the board
       ///
       case 'cards_update':
-        print(message["data"]);
-        // List<List<int>> _data = new List<List<int>>.from(message["data"]);
         opponentsCard =
             new List<dynamic>.from(message["data"]['opponentsCard']);
         myCard = new List<dynamic>.from(message["data"]['myCard']);
+        setState(() {});
+        break;
+
+      case 'switch_turn':
+        isMyTurn = message["data"];
+        break;
+
+      case 'select_card':
+        opponentSelectedCard = int.parse(message["data"]);
+        setState(() {});
+        break;
+
+      case 'hint_update':
+        gameHints = message["data"];
+        setState(() {});
+        break;
+
+      case 'show_skip':
+        showSkipButton = message["data"];
         setState(() {});
         break;
 
@@ -82,12 +105,36 @@ class _GamePageState extends State<GamePage> {
       //   break;
 
       case 'gameover':
-        // var data = (message["data"] as String).split(';');
-        // grid[int.parse(data[0])] = data[1];
-        // Force rebuild
         setState(() {});
         break;
     }
+  }
+
+  void onCardTap(int index, bool isMyCard) {
+    if (!isMyTurn) return;
+
+    if (!isMyCard) {
+      if (opponentsCard[index]['show'] == 1) return;
+      selfSelectedCard = selfSelectedCard != index ? index : -1;
+      setState(() {});
+
+      game.send('select_card', '${selfSelectedCard}');
+    } else {
+      game.send('punish', '${index}');
+    }
+  }
+
+  void sendGuess(int guessNum) {
+    if (!isMyTurn) return;
+    game.send('play', '${selfSelectedCard},${guessNum}');
+    selfSelectedCard = -1;
+    setState(() {});
+  }
+
+  void skipRound() {
+    game.send('skip', '');
+    selfSelectedCard = -1;
+    setState(() {});
   }
 
   @override
@@ -126,10 +173,28 @@ class _GamePageState extends State<GamePage> {
         ));
   }
 
-  Widget _buildInstruction(String gameHints) {
+  Widget _buildInstruction() {
     return Container(
       child: Text(gameHints),
     );
+  }
+
+  Widget _buildSkip() {
+    if (!showSkipButton) {
+      return Container();
+    }
+    return Container(
+        child: ElevatedButton(
+      onPressed: skipRound,
+      child: new Text('Skip'),
+    ));
+  }
+
+  Widget _buildSelectPanel() {
+    if (selfSelectedCard == -1) {
+      return Container();
+    }
+    return SelectPanel(callback: sendGuess);
   }
 
   Widget _buildCards() {
@@ -137,10 +202,19 @@ class _GamePageState extends State<GamePage> {
         child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Cards(cardList: opponentsCard),
-        // Cards(cardList: allCardValue, cardColor: Colors.grey),
+        Cards(
+          cardList: opponentsCard,
+          onTap: onCardTap,
+          selectedCard: selfSelectedCard,
+          isMyCard: false,
+        ),
+        _buildSelectPanel(),
+        _buildInstruction(),
+        _buildSkip(),
         Cards(
           cardList: myCard,
+          onTap: onCardTap,
+          selectedCard: opponentSelectedCard,
           isMyCard: true,
         ),
       ],

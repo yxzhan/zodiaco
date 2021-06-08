@@ -44,7 +44,6 @@ class SelectPanel extends StatelessWidget {
             height: cardHeight,
             decoration: BoxDecoration(border: Border.all(color: Colors.black)),
             margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            // color: Colors.red,
             child: Center(child: Text(_cardsRow[i].toString())),
           ));
       res.add(cardElement);

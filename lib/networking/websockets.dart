@@ -1,15 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/io.dart';
+import 'dart:io';
 
-///
-/// Application-level global variable to access the WebSockets
-///
 WebSocketsNotifications sockets = new WebSocketsNotifications();
 
 ///
 /// Put your WebSockets server IP address and port number
 ///
-const String _SERVER_ADDRESS = "ws://192.168.2.126:23456";
+const String _SERVER_ADDRESS = 'ws://192.168.2.126:23456';
 
 class WebSocketsNotifications {
   static final WebSocketsNotifications _sockets =
@@ -38,6 +36,17 @@ class WebSocketsNotifications {
   ///
   ObserverList<Function> _listeners = new ObserverList<Function>();
 
+  ///
+  /// Websocket server address
+  ///
+  Future getServerAddress() async {
+    for (var interface in await NetworkInterface.list()) {
+      for (var addr in interface.addresses) {
+        return 'ws://${addr.address}:23456';
+      }
+    }
+  }
+
   /// ----------------------------------------------------------
   /// Initialization the WebSockets connection with the server
   /// ----------------------------------------------------------
@@ -51,7 +60,9 @@ class WebSocketsNotifications {
     /// Open a new WebSocket communication
     ///
     try {
-      _channel = new IOWebSocketChannel.connect(_SERVER_ADDRESS);
+      String serverAddress =
+          _SERVER_ADDRESS != null ? _SERVER_ADDRESS : await getServerAddress();
+      _channel = new IOWebSocketChannel.connect(serverAddress);
 
       ///
       /// Start listening to new notifications / messages

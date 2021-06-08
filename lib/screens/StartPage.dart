@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
-import '../demo/GamePage.dart';
+import './GamePage.dart';
 import '../utils/Utils.dart';
 
 class StartPage extends StatefulWidget {
@@ -50,7 +50,7 @@ class _StartPageState extends State<StartPage> {
 
       ///
       /// Each time a new player joins, we need to
-      ///   * record the new list of players
+      ///   * record amount of online players
       ///
       case "players_list":
         playersListLength = message["data"];
@@ -58,13 +58,7 @@ class _StartPageState extends State<StartPage> {
         setState(() {});
         break;
 
-      ///
-      /// When a game is launched by another player,
-      /// we accept the new game and automatically redirect
-      /// to the game board.
-      /// As we are not the new game initiator, we will be
-      /// using the "O"
-      ///
+      // when matched players ready, start a new game
       case 'new_game':
         gameState = '';
         setState(() {});

@@ -92,11 +92,13 @@ wsServer.on('request', function (request) {
   // Listen to any message sent by that player
   //
   connection.on('message', function (data) {
-
     //
     // Process the requested action
     //
     var message = JSON.parse(data.utf8Data);
+    console.log(message)
+
+    if (message.action != 'join' && player.state == PLAYERSTATES.uninitialized) return
     switch (message.action) {
       //
       // When the user sends the "join" action, he provides a name.
@@ -122,7 +124,6 @@ wsServer.on('request', function (request) {
         // that the first one resigned
         //
       case 'resign':
-        console.log('resigned');
         Players[player.opponentIndex].sendMsg({
           'action': 'resigned'
         });
@@ -130,14 +131,32 @@ wsServer.on('request', function (request) {
         break;
 
         //
-        // A player sends a move.  Let's forward the move to the other player
+        // A player sends a guess
         //
       case 'play':
-        // Players[player.opponentIndex].sendMsg({
-        //   'action': 'play',
-        //   'data': message.data
-        // });
         checkGuess(player, message.data)
+        break;
+        //
+        // A player select a opponent's card
+        //
+      case 'select_card':
+        Players[player.opponentIndex].sendMsg({
+          'action': 'select_card',
+          'data': message.data
+        });
+        break;
+        //
+        // A player takes punishment
+        //
+      case 'punish':
+        punish(player, message.data)
+        break;
+        //
+        // A player takes punishment
+        //
+      case 'skip':
+        // punish(player, message.data)
+
         break;
     }
   });
@@ -259,6 +278,7 @@ function DealCards(player) {
     }
   })
   updateCards(player)
+  console.log('New Game')
 }
 
 // ---------------------------------------------------------
@@ -271,9 +291,35 @@ function checkGuess(player, data) {
   if (guessNum == opponent.cards[index]['value']) {
     opponent.cards[index]['show'] = 1
     updateCards(player)
+    player.sendMsg({
+      'action': 'hint_update',
+      'data': 'Correct! Continue guessing or skip this round.'
+    })
+    player.sendMsg({
+      'action': 'show_skip',
+      'data': true
+    })
+  } else {
+    player.sendMsg({
+      'action': 'hint_update',
+      'data': 'Guessed wrong! Turn over one of your card.'
+    })
   }
 }
 
+
+// ---------------------------------------------------------
+// Unfold players' own cards
+// ---------------------------------------------------------
+function punish(player, data) {
+  let index = parseInt(data)
+  player.cards[index]['show'] = 1
+  updateCards(player)
+}
+
+// ---------------------------------------------------------
+// Update card display state
+// ---------------------------------------------------------
 function updateCards(player) {
   let opponent = Players[player.opponentIndex]
   player.sendMsg({
