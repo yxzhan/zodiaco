@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:web_socket_channel/io.dart';
+// import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:io';
 
 WebSocketsNotifications sockets = new WebSocketsNotifications();
@@ -22,7 +23,7 @@ class WebSocketsNotifications {
   ///
   /// The WebSocket "open" channel
   ///
-  IOWebSocketChannel _channel;
+  WebSocketChannel _channel;
 
   ///
   /// Is the connection established?
@@ -62,7 +63,7 @@ class WebSocketsNotifications {
     try {
       String serverAddress =
           _SERVER_ADDRESS != null ? _SERVER_ADDRESS : await getServerAddress();
-      _channel = new IOWebSocketChannel.connect(serverAddress);
+      _channel = new WebSocketChannel.connect(Uri.parse(serverAddress));
 
       ///
       /// Start listening to new notifications / messages
