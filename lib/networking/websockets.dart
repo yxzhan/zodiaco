@@ -2,13 +2,9 @@ import 'package:flutter/foundation.dart';
 // import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:io';
+import '../utils/Configs.dart';
 
 WebSocketsNotifications sockets = new WebSocketsNotifications();
-
-///
-/// Put your WebSockets server IP address and port number
-///
-const String _SERVER_ADDRESS = 'wss://fluttering-boiled-freezer.glitch.me';
 
 class WebSocketsNotifications {
   static final WebSocketsNotifications _sockets =
@@ -40,13 +36,13 @@ class WebSocketsNotifications {
   ///
   /// Websocket server address
   ///
-  Future getServerAddress() async {
-    for (var interface in await NetworkInterface.list()) {
-      for (var addr in interface.addresses) {
-        return 'ws://${addr.address}:23456';
-      }
-    }
-  }
+  // Future getServerAddress() async {
+  //   for (var interface in await NetworkInterface.list()) {
+  //     for (var addr in interface.addresses) {
+  //       return 'ws://${addr.address}:23456';
+  //     }
+  //   }
+  // }
 
   /// ----------------------------------------------------------
   /// Initialization the WebSockets connection with the server
@@ -56,13 +52,14 @@ class WebSocketsNotifications {
     /// Just in case, close any previous communication
     ///
     reset();
+    const bool isProduction = bool.fromEnvironment('dart.vm.product');
 
     ///
     /// Open a new WebSocket communication
     ///
     try {
       String serverAddress =
-          _SERVER_ADDRESS != null ? _SERVER_ADDRESS : await getServerAddress();
+          isProduction ? PROD_SERVER_ADDRESS : LOCAL_SERVER_ADDRESS;
       _channel = new WebSocketChannel.connect(Uri.parse(serverAddress));
 
       ///
