@@ -31,6 +31,7 @@ class _GamePageState extends State<GamePage> {
   bool showSkipButton = false;
   bool showRestartButton = false;
   bool isPunishing = false;
+  bool reorderable = true;
   @override
   void initState() {
     super.initState();
@@ -149,6 +150,13 @@ class _GamePageState extends State<GamePage> {
     game.send('ready', '');
   }
 
+  void onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      var card = myCard.removeAt(oldIndex);
+      myCard.insert(newIndex, card);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,6 +213,7 @@ class _GamePageState extends State<GamePage> {
           onTap: onCardTap,
           selectedCard: selfSelectedCard,
           isMyCard: false,
+          reorderable: false,
         ),
         _buildSelectPanel(),
         _buildInstruction(),
@@ -214,6 +223,8 @@ class _GamePageState extends State<GamePage> {
           onTap: onCardTap,
           selectedCard: opponentSelectedCard,
           isMyCard: true,
+          reorderable: reorderable,
+          onReorder: onReorder,
         ),
       ],
     ));

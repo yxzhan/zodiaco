@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../utils/Configs.dart';
+import 'package:reorderables/reorderables.dart';
 
-class Cards extends StatelessWidget {
+class Cards extends StatefulWidget {
   Cards({
     Key key,
     @required this.cardList,
     @required this.onTap,
     @required this.selectedCard,
+    @required this.reorderable,
+    this.onReorder,
     this.cardColor = Colors.yellow,
     this.isMyCard = false,
   }) : super(key: key);
@@ -15,22 +18,44 @@ class Cards extends StatelessWidget {
   final Color cardColor;
   final bool isMyCard;
   final Function(int, bool) onTap;
+  final Function(int, int) onReorder;
   final int selectedCard;
+  final bool reorderable;
+  @override
+  _CardsState createState() => _CardsState();
+}
+
+class _CardsState extends State<Cards> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8.0,
-      runSpacing: 16.0,
-      children: _buildCards(context),
-    );
+    if (widget.reorderable) {
+      return ReorderableWrap(
+        spacing: 8.0,
+        runSpacing: 16.0,
+        padding: const EdgeInsets.all(8),
+        crossAxisAlignment: WrapCrossAlignment.center,
+        onReorder: widget.onReorder,
+        children: _buildCards(),
+      );
+    } else {
+      return Wrap(
+        spacing: 8.0,
+        runSpacing: 16.0,
+        children: _buildCards(),
+      );
+    }
   }
 
-  List<Widget> _buildCards(BuildContext context) {
+  List<Widget> _buildCards() {
     double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
-    for (var i = 0; i < cardList.length; i++) {
+    for (var i = 0; i < widget.cardList.length; i++) {
       String cardNum = '';
       Widget cardElement;
       double cardRotation = 0.8;
@@ -38,17 +63,17 @@ class Cards extends StatelessWidget {
       Color textColor = Colors.white;
       double scale = 1;
 
-      if (cardList[i]['show'] == 1) {
+      if (widget.cardList[i]['show'] == 1) {
         cardRotation = 0;
       }
-      if (cardList[i]['color'] == 'white') {
+      if (widget.cardList[i]['color'] == 'white') {
         bgColor = Colors.white;
         textColor = Colors.black;
       }
-      if (cardList[i]['show'] == 1 || isMyCard) {
-        cardNum = cardList[i]['value'].toString();
+      if (widget.cardList[i]['show'] == 1 || widget.isMyCard) {
+        cardNum = widget.cardList[i]['value'].toString();
       }
-      if (selectedCard == i) {
+      if (widget.selectedCard == i) {
         scale = 1.3;
       }
       cardElement = Transform(
@@ -58,7 +83,7 @@ class Cards extends StatelessWidget {
             ..rotateX(cardRotation)
             ..scale(scale),
           child: GestureDetector(
-              onTap: () => {onTap(i, isMyCard)},
+              onTap: () => {widget.onTap(i, widget.isMyCard)},
               child: Container(
                 width: cardWidth,
                 height: cardHeight,
