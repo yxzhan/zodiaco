@@ -13,8 +13,14 @@ var webSocketsServerPort = 23456; // Adapt to the listening port number you want
 // websocket and http servers
 var webSocketServer = require('websocket').server;
 var http = require('http');
-// const https = require('https');
-// const fs = require('fs');
+
+var server = http.createServer(function (req, res) {
+  res.writeHead(200);
+  res.end("hello world\n");
+})
+
+server.listen(webSocketsServerPort);
+
 
 const PLAYERSTATES = {
   uninitialized: 0,
@@ -27,32 +33,9 @@ const PLAYERSTATES = {
 }
 
 const MESSAGE = {}
-
-// const options = {
-//   key: fs.readFileSync('server/cert/key.pem'),
-//   cert: fs.readFileSync('server/cert/cert.pem')
-// };
-
-// var server = https.createServer(options, function (request, response) {
-//   // Not important for us. We're writing WebSocket server,
-//   // not HTTP server
-// });
-
-/**
- * HTTP server to implement WebSockets
- */
-var server = http.createServer(function (request, response) {
-  // Not important for us. We're writing WebSocket server,
-  // not HTTP server
-});
-server.listen(webSocketsServerPort, function () {
-  console.log((new Date()) + " Server is listening on port " +
-    webSocketsServerPort);
-});
-
-/**
- * WebSocket server
- */
+// /**
+//  * WebSocket server
+//  */
 var wsServer = new webSocketServer({
   // WebSocket server is tied to a HTTP server. WebSocket
   // request is just an enhanced HTTP request. For more info
@@ -60,8 +43,8 @@ var wsServer = new webSocketServer({
   httpServer: server
 });
 
-// This callback function is called every time someone
-// tries to connect to the WebSocket server
+// // This callback function is called every time someone
+// // tries to connect to the WebSocket server
 wsServer.on('request', function (request) {
   var connection = request.accept(null, request.origin);
 
