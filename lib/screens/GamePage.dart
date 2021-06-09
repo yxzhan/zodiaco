@@ -102,6 +102,8 @@ class _GamePageState extends State<GamePage> {
 
       case 'punish':
         isPunishing = true;
+        selfSelectedCard = -1;
+        setState(() {});
         break;
 
       case 'gameover':
@@ -153,16 +155,17 @@ class _GamePageState extends State<GamePage> {
           title: Text('GameBoard'),
         ),
         body: SafeArea(
-          child: Center(
+          child: Container(
+              color: Colors.yellow,
               child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              _buildPlayerInfo(widget.opponentName, !isMyTurn),
-              _buildGameBoard(),
-              _buildPlayerInfo(widget.playerName, isMyTurn)
-            ],
-          )),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildPlayerInfo(widget.opponentName, !isMyTurn),
+                  _buildGameBoard(),
+                  _buildPlayerInfo(widget.playerName, isMyTurn)
+                ],
+              )),
         ));
   }
 

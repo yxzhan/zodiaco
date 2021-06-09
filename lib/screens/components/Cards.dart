@@ -33,37 +33,42 @@ class Cards extends StatelessWidget {
       String cardNum = '';
       Widget cardElement;
       double cardRotation = 0.8;
-      Color borderColor = Colors.black;
-      double borderWidth = 2;
+      Color bgColor = Colors.black;
+      Color textColor = Colors.white;
+      double scale = 1;
 
       if (cardList[i]['show'] == 1) {
         cardRotation = 0;
+      }
+      if (cardList[i]['color'] == 'white') {
+        bgColor = Colors.white;
+        textColor = Colors.black;
       }
       if (cardList[i]['show'] == 1 || isMyCard) {
         cardNum = cardList[i]['value'].toString();
       }
       if (selectedCard == i) {
-        borderColor = Colors.red;
-        borderWidth = 4;
+        scale = 1.3;
       }
       cardElement = Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
             ..setEntry(3, 2, 0.01)
-            ..rotateX(cardRotation),
+            ..rotateX(cardRotation)
+            ..scale(scale),
           child: GestureDetector(
               onTap: () => {onTap(i, isMyCard)},
               child: Container(
                 width: cardWidth,
                 height: cardHeight,
-                decoration: BoxDecoration(
-                    border: Border.all(color: borderColor, width: borderWidth)),
+                // decoration: BoxDecoration(
+                //     border: Border.all(color: borderColor, width: borderWidth)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                // color: cardColor,
+                color: bgColor,
                 child: Center(
                     child: Text(
                   cardNum,
-                  style: TextStyle(fontSize: 24),
+                  style: TextStyle(fontSize: 24, color: textColor),
                 )),
               )));
       res.add(cardElement);

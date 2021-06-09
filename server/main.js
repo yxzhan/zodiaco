@@ -261,29 +261,66 @@ function DealCards(player) {
   const maxValue = 12
   const splitSize = 10
   // Generate cards
-  let allCardsVal = Array.from(Array(maxValue).keys()).map(v => v + 1)
-  allCardsVal = _shuffle(allCardsVal.concat(allCardsVal))
-
-  // sort cards according to values
-  let cards1 = allCardsVal.slice(0, splitSize).sort((v, v2) => v - v2)
-  let cards2 = allCardsVal.slice(splitSize, splitSize * 2).sort((v, v2) => v - v2)
-
-  player.cards = cards1.map(v => {
+  let allBlackCards = Array.from(Array(maxValue).keys()).map(v => {
     return {
       show: 0,
-      value: v
+      value: v + 1,
+      color: 'black'
     }
   })
-
-  opponent.cards = cards2.map(v => {
+  let allWhiteCards = allBlackCards.map(v => {
     return {
       show: 0,
-      value: v
+      value: v.value,
+      color: 'white'
     }
   })
+  let allCardsVal = _shuffle(allBlackCards.concat(allWhiteCards))
+  // sort cards
+  let cards1 = allCardsVal.slice(0, splitSize).sort(_sort)
+  let cards2 = allCardsVal.slice(splitSize, splitSize * 2).sort(_sort)
+
+  player.cards = cards1
+  opponent.cards = cards2
   updateCards(player)
   console.log('New Game')
   switchTurn(player, Math.random() > 0.5)
+}
+
+// ---------------------------------------------------------
+// Sort cards helper function
+// According to it number and color (white is greater than black)
+// ---------------------------------------------------------
+function _sort(a, b) {
+  if (a.value < b.value) {
+    return -1
+  }
+  if (a.value == b.value && a.color == 'white') {
+    return -1
+  }
+  return 0
+}
+// ---------------------------------------------------------
+// Shuffle cards helper function
+// ---------------------------------------------------------
+function _shuffle(array) {
+  var currentIndex = array.length,
+    randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]
+    ];
+  }
+
+  return array;
 }
 
 // ---------------------------------------------------------
@@ -377,10 +414,14 @@ function checkGuess(player, data) {
       'action': 'show_skip',
       'data': true
     })
+    opponent.sendMsg({
+      'action': 'hint_update',
+      'data': `${player.name} correctly guessed this card.`
+    })
   } else {
     player.sendMsg({
       'action': 'hint_update',
-      'data': 'Guessed wrong! Turn over one of your card.'
+      'data': `Guessed wrong! That is not a ${guessNum}. Turn over one of your card.`
     })
 
     player.sendMsg({
@@ -389,6 +430,10 @@ function checkGuess(player, data) {
     player.sendMsg({
       'action': 'show_skip',
       'data': false
+    })
+    opponent.sendMsg({
+      'action': 'hint_update',
+      'data': `${player.name} guessed this is a ${guessNum}. :)`
     })
   }
 }
@@ -423,27 +468,4 @@ function updateCards(player) {
       'opponentsCard': player.cards
     }
   })
-}
-
-// ---------------------------------------------------------
-// Shuffle array helper function
-// ---------------------------------------------------------
-function _shuffle(array) {
-  var currentIndex = array.length,
-    randomIndex;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]
-    ];
-  }
-
-  return array;
 }
