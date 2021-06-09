@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/Configs.dart';
 
 class SelectPanel extends StatelessWidget {
   SelectPanel({Key key, this.callback}) : super(key: key);
@@ -19,7 +20,7 @@ class SelectPanel extends StatelessWidget {
   }
 
   List<Widget> _buildCards(BuildContext context) {
-    double cardWidth = MediaQuery.of(context).size.width * 0.12;
+    double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.2;
     List<Widget> res = [];
     for (var i = 0; i < allCardValue.length; i++) {

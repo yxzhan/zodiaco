@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/Configs.dart';
 
 class Cards extends StatelessWidget {
   Cards({
@@ -26,7 +27,7 @@ class Cards extends StatelessWidget {
   }
 
   List<Widget> _buildCards(BuildContext context) {
-    double cardWidth = MediaQuery.of(context).size.width * 0.12;
+    double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
     for (var i = 0; i < cardList.length; i++) {

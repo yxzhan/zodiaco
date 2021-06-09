@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../networking/GameCommunication.dart';
 import './components/Cards.dart';
 import './components/SelectPanel.dart';
+import '../utils/Configs.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({
@@ -155,18 +156,22 @@ class _GamePageState extends State<GamePage> {
           title: Text('GameBoard'),
         ),
         body: SafeArea(
-          child: Container(
-              color: Colors.yellow,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _buildPlayerInfo(widget.opponentName, !isMyTurn),
-                  _buildGameBoard(),
-                  _buildPlayerInfo(widget.playerName, isMyTurn)
-                ],
-              )),
-        ));
+            child: Container(
+                color: GAMEBOARD_COLOR,
+                child: Center(
+                  child: Container(
+                      width: GAMEBOARD_MAX_WIDTH,
+                      color: GAMEBOARD_COLOR,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _buildPlayerInfo(widget.opponentName, !isMyTurn),
+                          _buildGameBoard(),
+                          _buildPlayerInfo(widget.playerName, isMyTurn)
+                        ],
+                      )),
+                ))));
   }
 
   Widget _buildPlayerInfo(String name, bool isPlaying) {

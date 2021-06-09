@@ -125,7 +125,7 @@ wsServer.on('request', function (request) {
         // that the first one resigned
         //
       case 'resign':
-        Players[player.opponentIndex].sendMsg({
+        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
           'action': 'resigned'
         });
         player.opponentIndex = null;
@@ -142,7 +142,7 @@ wsServer.on('request', function (request) {
         // A player select a opponent's card
         //
       case 'select_card':
-        Players[player.opponentIndex].sendMsg({
+        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
           'action': 'select_card',
           'data': message.data
         });
@@ -199,7 +199,7 @@ Player.prototype = {
     };
   },
   sendMsg: function (msg) {
-    this._connection.sendUTF(JSON.stringify(msg))
+    this._connection && this._connection.sendUTF(JSON.stringify(msg))
   },
   setOpponent: function (id) {
     var self = this;
@@ -389,7 +389,7 @@ function switchTurn(player, turn) {
     'data': turn ? player.name + waitHint : turnHint
   })
 
-  Players[player.opponentIndex].sendMsg({
+  Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
     'action': 'select_card',
     'data': '-1'
   });
