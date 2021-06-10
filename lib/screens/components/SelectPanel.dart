@@ -22,9 +22,11 @@ class SelectPanel extends StatelessWidget {
   List<Widget> _buildCards(BuildContext context) {
     double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.2;
+
     List<Widget> res = [];
     for (var i = 0; i < allCardValue.length; i++) {
       Widget cardElement;
+      String cardNum = allCardValue[i] == 1 ? 'X' : allCardValue[i].toString();
       cardElement = GestureDetector(
           onTap: () => {callback(allCardValue[i])},
           child: Container(
@@ -35,7 +37,7 @@ class SelectPanel extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Center(
                 child: Text(
-              allCardValue[i].toString(),
+              cardNum,
               style: TextStyle(fontSize: 20),
             )),
           ));

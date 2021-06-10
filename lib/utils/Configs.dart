@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const double GAMEBOARD_MAX_WIDTH = 375;
-const Color GAMEBOARD_COLOR = Colors.yellow;
+const Color GAMEBOARD_COLOR = Colors.greenAccent;
 
 ///
 /// Put your WebSockets server IP address and port number

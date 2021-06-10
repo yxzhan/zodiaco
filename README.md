@@ -5,14 +5,14 @@ A new Flutter project.
 ## Getting Started
 
 ### Server Setup
-
+Game server is a Nodejs based websocket server.
 #### 1. Install Nodejs
 
 https://nodejs.org/en/download/
 
 #### 2. Install npm dependencies
 `npm i`
-#### 3. Run websocket server
+#### 3. Run server
 `npm run start`
 
 

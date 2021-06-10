@@ -21,6 +21,7 @@ var server = http.createServer(function (req, res) {
 
 server.listen(webSocketsServerPort);
 
+const SPECIALCARD = 'X'
 
 const PLAYERSTATES = {
   uninitialized: 0,
@@ -101,6 +102,10 @@ wsServer.on('request', function (request) {
       case 'ready':
         player.state = PLAYERSTATES.ready;
         DealCards(player);
+        break;
+
+      case 'on_reorder':
+        player.cards = JSON.parse(message.data)
         break;
         //
         // When a player resigns, we need to break the relationship
@@ -260,51 +265,105 @@ function DealCards(player) {
   })
   let allCardsVal = _shuffle(allBlackCards.concat(allWhiteCards))
   // sort cards
-  let cards1 = allCardsVal.slice(0, splitSize).sort(_sort)
-  let cards2 = allCardsVal.slice(splitSize, splitSize * 2).sort(_sort)
+  let cards1 = _sort(allCardsVal.slice(0, splitSize))
+  let cards2 = _sort(allCardsVal.slice(splitSize, splitSize * 2))
 
   player.cards = cards1
   opponent.cards = cards2
-  updateCards(player)
+  updateCards(player, false)
+
   console.log('New Game')
-  switchTurn(player, Math.random() > 0.5)
+  specialCardsreorder(player)
+
+
+  // ---------------------------------------------------------
+  // Sort cards helper function
+  // value 1 will be a special number can be appear in any position
+  // According to it number and color (white is greater than black)
+  // ---------------------------------------------------------
+  function _sort(cards) {
+    let specialCards = cards.filter(v => v.value == 1)
+    let normalCards = cards.filter(v => v.value != 1)
+    let sortedCards = normalCards.sort((a, b) => {
+      if (a.value < b.value) return -1
+      if (a.value == b.value && a.color == 'white') return -1
+      return 0
+    })
+    // randomly insert special cards to sorted cards
+    specialCards.forEach(c => {
+      sortedCards.splice(Math.round(Math.random() * sortedCards.length), 0, c);
+    })
+
+    return sortedCards
+  }
+
+  // ---------------------------------------------------------
+  // Shuffle cards helper function
+  // ---------------------------------------------------------
+  function _shuffle(array) {
+    var currentIndex = array.length,
+      randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]
+      ];
+    }
+
+    return array;
+  }
 }
 
 // ---------------------------------------------------------
-// Sort cards helper function
-// According to it number and color (white is greater than black)
+// Ask players to place special cards to any position
 // ---------------------------------------------------------
-function _sort(a, b) {
-  if (a.value < b.value) {
-    return -1
+function specialCardsreorder(player) {
+  let opponent = Players[player.opponentIndex]
+
+  function _reorderControl(val) {
+    player.sendMsg({
+      'action': 'allow_reorder',
+      'data': val
+
+    })
+    opponent.sendMsg({
+      'action': 'allow_reorder',
+      'data': val
+    })
   }
-  if (a.value == b.value && a.color == 'white') {
-    return -1
-  }
-  return 0
+
+  _reorderControl(true)
+  let countDown = 15
+  let counter = setInterval(() => {
+    let hintText = `Long press your special Card \"${SPECIALCARD}\" to move them (if you have them),
+    you can place them in any postion.
+    Game will started in ${countDown} seconds.`
+    // send hint to both player
+    player.sendMsg({
+      'action': 'hint_update',
+      'data': hintText
+    })
+    opponent.sendMsg({
+      'action': 'hint_update',
+      'data': hintText
+    })
+    countDown--;
+    if (countDown == 0) {
+      clearInterval(counter)
+      _reorderControl(false)
+      updateCards(player, true)
+      switchTurn(player, Math.random() > 0.5)
+    }
+  }, 1000);
 }
-// ---------------------------------------------------------
-// Shuffle cards helper function
-// ---------------------------------------------------------
-function _shuffle(array) {
-  var currentIndex = array.length,
-    randomIndex;
 
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]
-    ];
-  }
-
-  return array;
-}
 
 // ---------------------------------------------------------
 // Check if game is over
@@ -435,20 +494,20 @@ function punish(player, data) {
 // ---------------------------------------------------------
 // Update cards display state
 // ---------------------------------------------------------
-function updateCards(player) {
+function updateCards(player, displayOpponentCards = true) {
   let opponent = Players[player.opponentIndex]
   player.sendMsg({
     'action': 'cards_update',
     'data': {
       'myCard': player.cards,
-      'opponentsCard': opponent.cards
+      'opponentsCard': displayOpponentCards ? opponent.cards : []
     }
   })
   opponent.sendMsg({
     'action': 'cards_update',
     'data': {
       'myCard': opponent.cards,
-      'opponentsCard': player.cards
+      'opponentsCard': displayOpponentCards ? player.cards : []
     }
   })
 }

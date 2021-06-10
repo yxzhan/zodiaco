@@ -3,6 +3,7 @@ import '../networking/GameCommunication.dart';
 import './components/Cards.dart';
 import './components/SelectPanel.dart';
 import '../utils/Configs.dart';
+import 'dart:convert';
 
 class GamePage extends StatefulWidget {
   GamePage({
@@ -31,7 +32,7 @@ class _GamePageState extends State<GamePage> {
   bool showSkipButton = false;
   bool showRestartButton = false;
   bool isPunishing = false;
-  bool reorderable = true;
+  bool reorderable = false;
   @override
   void initState() {
     super.initState();
@@ -63,6 +64,13 @@ class _GamePageState extends State<GamePage> {
       ///
       case 'resigned':
         Navigator.of(context).pop();
+        break;
+
+      ///
+      /// Allow player to place special card to any position
+      ///
+      case 'allow_reorder':
+        reorderable = message["data"];
         break;
 
       ///
@@ -151,10 +159,12 @@ class _GamePageState extends State<GamePage> {
   }
 
   void onReorder(int oldIndex, int newIndex) {
-    setState(() {
-      var card = myCard.removeAt(oldIndex);
-      myCard.insert(newIndex, card);
-    });
+    var card = myCard.elementAt(oldIndex);
+    if (card['value'] != 1) return;
+    myCard.removeAt(oldIndex);
+    myCard.insert(newIndex, card);
+    game.send('on_reorder', json.encode(myCard));
+    setState(() {});
   }
 
   @override

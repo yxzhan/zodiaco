@@ -72,6 +72,7 @@ class _CardsState extends State<Cards> {
       }
       if (widget.cardList[i]['show'] == 1 || widget.isMyCard) {
         cardNum = widget.cardList[i]['value'].toString();
+        cardNum = cardNum == '1' ? 'X' : cardNum;
       }
       if (widget.selectedCard == i) {
         scale = 1.3;
