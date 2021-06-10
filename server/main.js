@@ -1,27 +1,45 @@
-/**
- * Code adapted from
- * https://www.didierboelens.com/2018/06/web-sockets-build-a-real-time-game/
- */
+/*
+This is the main Node.js server script for your project
+- The two endpoints this back-end provides are defined in fastify.get and fastify.post below
+*/
 
-/**
- * Parameters
- */
+const path = require("path");
+
+const port = process.env.PORT || '23456'
+const host = process.env.HOST || '0.0.0.0'
+
+// Require the fastify framework and instantiate it
+const fastify = require("fastify")({
+  // Set this to true for detailed logging:
+  logger: false
+});
+
+// Run the server and report out to the logs
+fastify.listen(port, host, function (err, address) {
+  if (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+  console.log(`Your app is listening on ${address}`);
+  fastify.log.info(`server listening on ${address}`);
+});
+
+
+
 var webSocketsServerPort = 23456; // Adapt to the listening port number you want to use
-/**
- * Global variables
- */
-// websocket and http servers
+
 var webSocketServer = require('websocket').server;
-var http = require('http');
 
-var server = http.createServer(function (req, res) {
-  res.writeHead(200);
-  res.end("hello world\n");
-})
 
-server.listen(webSocketsServerPort);
 
-const SPECIALCARD = 'X'
+//  * WebSocket server
+//  */
+var wsServer = new webSocketServer({
+  // WebSocket server is tied to a HTTP server. WebSocket
+  // request is just an enhanced HTTP request. For more info
+  // http://tools.ietf.org/html/rfc6455#page-6
+  httpServer: fastify.server
+});
 
 const PLAYERSTATES = {
   uninitialized: 0,
@@ -32,17 +50,23 @@ const PLAYERSTATES = {
   waiting: 5,
   over: 6
 }
-
+const SPECIALCARD = 1
+const CARD_DISPLAY_STRING = {
+  1: 'X',
+  2: '2',
+  3: '3',
+  4: '4',
+  5: '5',
+  6: '6',
+  7: '7',
+  8: '8',
+  9: '9',
+  10: '10',
+  11: '11',
+  12: '12',
+}
 const MESSAGE = {}
 // /**
-//  * WebSocket server
-//  */
-var wsServer = new webSocketServer({
-  // WebSocket server is tied to a HTTP server. WebSocket
-  // request is just an enhanced HTTP request. For more info
-  // http://tools.ietf.org/html/rfc6455#page-6
-  httpServer: server
-});
 
 // // This callback function is called every time someone
 // // tries to connect to the WebSocket server
@@ -253,14 +277,16 @@ function DealCards(player) {
     return {
       show: 0,
       value: v + 1,
-      color: 'black'
+      color: 'black',
+      display_str: CARD_DISPLAY_STRING[v + 1]
     }
   })
-  let allWhiteCards = allBlackCards.map(v => {
+  let allWhiteCards = Array.from(Array(maxValue).keys()).map(v => {
     return {
       show: 0,
-      value: v.value,
-      color: 'white'
+      value: v + 1,
+      color: 'white',
+      display_str: CARD_DISPLAY_STRING[v + 1]
     }
   })
   let allCardsVal = _shuffle(allBlackCards.concat(allWhiteCards))
@@ -342,7 +368,7 @@ function specialCardsreorder(player) {
   _reorderControl(true)
   let countDown = 15
   let counter = setInterval(() => {
-    let hintText = `Long press your special Card \"${SPECIALCARD}\" to move them (if you have them),
+    let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have them),
     you can place them in any postion.
     Game will started in ${countDown} seconds.`
     // send hint to both player
@@ -463,7 +489,7 @@ function checkGuess(player, data) {
   } else {
     player.sendMsg({
       'action': 'hint_update',
-      'data': `Guessed wrong! That is not a ${guessNum}. Turn over one of your card.`
+      'data': `Guessed wrong! That is not a ${CARD_DISPLAY_STRING[guessNum]}. Turn over one of your card.`
     })
 
     player.sendMsg({
@@ -475,11 +501,10 @@ function checkGuess(player, data) {
     })
     opponent.sendMsg({
       'action': 'hint_update',
-      'data': `${player.name} guessed this is a ${guessNum}. :)`
+      'data': `${player.name} guessed this is a ${CARD_DISPLAY_STRING[guessNum]}. :)`
     })
   }
 }
-
 
 // ---------------------------------------------------------
 // Unfold players' own cards
