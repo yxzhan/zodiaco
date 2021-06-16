@@ -23,8 +23,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: new StartPage(),
-      // home: GameBoard(playerName: 'JJ'),
-      // home: StartPage(),
     );
   }
 }

@@ -51,6 +51,8 @@ const PLAYERSTATES = {
   over: 6
 }
 const SPECIALCARD = 1
+const REORDERCOUNTDOWN = 150
+const DEALCARDSIZE = 10
 const CARD_DISPLAY_STRING = {
   1: 'X',
   2: '2',
@@ -270,29 +272,27 @@ function DealCards(player) {
   let opponent = Players[player.opponentIndex]
   // wait until opponent ready
   if (opponent.state != PLAYERSTATES.ready) return
-  const maxValue = 12
-  const splitSize = 10
   // Generate cards
-  let allBlackCards = Array.from(Array(maxValue).keys()).map(v => {
+  let allBlackCards = Object.keys(CARD_DISPLAY_STRING).map(v => {
     return {
       show: 0,
-      value: v + 1,
+      value: parseInt(v),
       color: 'black',
-      display_str: CARD_DISPLAY_STRING[v + 1]
+      display_str: CARD_DISPLAY_STRING[v]
     }
   })
-  let allWhiteCards = Array.from(Array(maxValue).keys()).map(v => {
+  let allWhiteCards = Object.keys(CARD_DISPLAY_STRING).map(v => {
     return {
       show: 0,
-      value: v + 1,
+      value: parseInt(v),
       color: 'white',
-      display_str: CARD_DISPLAY_STRING[v + 1]
+      display_str: CARD_DISPLAY_STRING[v]
     }
   })
   let allCardsVal = _shuffle(allBlackCards.concat(allWhiteCards))
   // sort cards
-  let cards1 = _sort(allCardsVal.slice(0, splitSize))
-  let cards2 = _sort(allCardsVal.slice(splitSize, splitSize * 2))
+  let cards1 = _sort(allCardsVal.slice(0, DEALCARDSIZE))
+  let cards2 = _sort(allCardsVal.slice(DEALCARDSIZE, DEALCARDSIZE * 2))
 
   player.cards = cards1
   opponent.cards = cards2
@@ -364,13 +364,15 @@ function specialCardsreorder(player) {
       'data': val
     })
   }
-
   _reorderControl(true)
-  let countDown = 15
-  let counter = setInterval(() => {
+  let countDownSecond = REORDERCOUNTDOWN
+  let counter = setInterval(_countDown, 1000)
+  _countDown()
+
+  function _countDown() {
     let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have them),
     you can place them in any postion.
-    Game will started in ${countDown} seconds.`
+    Game will started in ${countDownSecond} seconds.`
     // send hint to both player
     player.sendMsg({
       'action': 'hint_update',
@@ -380,14 +382,14 @@ function specialCardsreorder(player) {
       'action': 'hint_update',
       'data': hintText
     })
-    countDown--;
-    if (countDown == 0) {
+    countDownSecond--;
+    if (countDownSecond == 0) {
       clearInterval(counter)
       _reorderControl(false)
       updateCards(player, true)
       switchTurn(player, Math.random() > 0.5)
     }
-  }, 1000);
+  }
 }
 
 

@@ -62,19 +62,25 @@ class _CardsState extends State<Cards> {
       Color bgColor = Colors.black;
       Color textColor = Colors.white;
       double scale = 1;
+      Border borderStyle;
 
+      // style of cards are open
       if (widget.cardList[i]['show'] == 1) {
         cardRotation = 0;
       }
+      // card color
       if (widget.cardList[i]['color'] == 'white') {
         bgColor = Colors.white;
         textColor = Colors.black;
       }
+      // show number on the card or not
       if (widget.cardList[i]['show'] == 1 || widget.isMyCard) {
         cardNum = widget.cardList[i]['display_str'];
       }
+      // card style when card is selected
       if (widget.selectedCard == i) {
         scale = 1.3;
+        borderStyle = Border.all(color: Colors.yellow, width: 2);
       }
       cardElement = Transform(
           alignment: Alignment.center,
@@ -87,10 +93,8 @@ class _CardsState extends State<Cards> {
               child: Container(
                 width: cardWidth,
                 height: cardHeight,
-                // decoration: BoxDecoration(
-                //     border: Border.all(color: borderColor, width: borderWidth)),
+                decoration: BoxDecoration(color: bgColor, border: borderStyle),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                color: bgColor,
                 child: Center(
                     child: Text(
                   cardNum,
