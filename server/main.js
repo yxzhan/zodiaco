@@ -51,7 +51,7 @@ const PLAYERSTATES = {
   over: 6
 }
 const SPECIALCARD = 1
-const REORDERCOUNTDOWN = 150
+const REORDERCOUNTDOWN = 15
 const DEALCARDSIZE = 10
 const CARD_DISPLAY_STRING = {
   1: 'X',
@@ -513,6 +513,7 @@ function checkGuess(player, data) {
 // ---------------------------------------------------------
 function punish(player, data) {
   let index = parseInt(data)
+  if (player.cards[index]['show']) return
   player.cards[index]['show'] = 1
   updateCards(player)
   switchTurn(player, false)
