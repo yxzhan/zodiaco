@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 250,
                 width: 250,
 
-                child: Image.asset("assets/loginanim.gif"),
+                child: Image.asset("assets/12anim.gif"),
                 //backgroundColor: Colors.white,
               )),
 
