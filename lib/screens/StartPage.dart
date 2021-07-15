@@ -19,7 +19,7 @@ class _StartPageState extends State<StartPage> {
   void initState() {
     super.initState();
 
-    // Todos: save user name to Shared Preference or database for next play
+    // TODO: save user name to Shared Preference or database for next play
     _name.text = randomName();
 
     ///
@@ -67,7 +67,7 @@ class _StartPageState extends State<StartPage> {
             context,
             new MaterialPageRoute(
               builder: (BuildContext context) => GamePage(
-                playerName: playerName, // Name of the opponent
+                myName: playerName, // Name of the opponent
                 opponentName: message["data"], // Name of the opponent
               ),
             ));
@@ -154,14 +154,10 @@ class _StartPageState extends State<StartPage> {
     } else {
       mainUI = _buildMatching();
     }
-    return new SafeArea(
-      bottom: false,
-      top: false,
-      child: Scaffold(
-          appBar: new AppBar(
-            title: new Text('Zodiaco'),
-          ),
-          body: mainUI),
-    );
+    return Scaffold(
+        appBar: new AppBar(
+          title: new Text('Zodiaco'),
+        ),
+        body: mainUI);
   }
 }

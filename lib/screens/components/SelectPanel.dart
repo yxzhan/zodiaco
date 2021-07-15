@@ -9,14 +9,16 @@ class SelectPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
-            child: Wrap(
-              spacing: 0,
-              runSpacing: 16,
-              children: _buildCards(context),
-            )));
+      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+        child: Wrap(
+          spacing: 0,
+          runSpacing: 16,
+          children: _buildCards(context),
+        ),
+      ),
+    );
   }
 
   List<Widget> _buildCards(BuildContext context) {
@@ -28,19 +30,21 @@ class SelectPanel extends StatelessWidget {
       Widget cardElement;
       String cardNum = allCardValue[i] == 1 ? 'X' : allCardValue[i].toString();
       cardElement = GestureDetector(
-          onTap: () => {callback(allCardValue[i])},
-          child: Container(
-            width: cardWidth,
-            height: cardHeight,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 2)),
-            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Center(
-                child: Text(
+        onTap: () => {callback(allCardValue[i])},
+        child: Container(
+          width: cardWidth,
+          height: cardHeight,
+          decoration:
+              BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
+          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Center(
+            child: Text(
               cardNum,
               style: TextStyle(fontSize: 20),
-            )),
-          ));
+            ),
+          ),
+        ),
+      );
       res.add(cardElement);
     }
     return res;
