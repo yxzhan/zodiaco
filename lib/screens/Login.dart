@@ -66,6 +66,15 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/loginbg.png"),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: null,
+          ),
           SizedBox(
             height: 60,
             width: 100,
