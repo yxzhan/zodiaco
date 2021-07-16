@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 
 /// This is the stateful widget that the main application instantiates.
 class LoadingCircle extends StatefulWidget {
+  final double size;
+  final int duration;
+
   const LoadingCircle({Key key, this.size = 50, this.duration = 5})
       : super(key: key);
 
-  final double size;
-  final int duration;
   @override
   _LoadingCircleState createState() => _LoadingCircleState();
 }

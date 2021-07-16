@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-import '../networking/GameCommunication.dart';
-import './components/Cards.dart';
-import './components/SelectPanel.dart';
-import '../utils/Configs.dart';
+import '../networking/game_communication.dart';
+import './components/card_panel.dart';
+import './components/selection_panel.dart';
+import '../utils/configs.dart';
 import 'dart:convert';
 
 class GamePage extends StatefulWidget {
-  GamePage({
-    Key key,
-    this.playerName,
-    this.opponentName,
-  }) : super(key: key);
-
-  ///
-  /// Name of the players
-  ///
-  final String opponentName;
   final String playerName;
+  final String opponentName;
+
+  GamePage({Key key, this.playerName, this.opponentName}) : super(key: key);
 
   @override
   _GamePageState createState() => _GamePageState();
@@ -33,6 +26,7 @@ class _GamePageState extends State<GamePage> {
   bool showRestartButton = false;
   bool isPunishing = false;
   bool reorderable = false;
+
   @override
   void initState() {
     super.initState();
@@ -134,15 +128,15 @@ class _GamePageState extends State<GamePage> {
       selfSelectedCard = selfSelectedCard != index ? index : -1;
       setState(() {});
 
-      game.send('select_card', '${selfSelectedCard}');
+      game.send('select_card', '$selfSelectedCard');
     } else if (isPunishing) {
-      game.send('punish', '${index}');
+      game.send('punish', '$index');
     }
   }
 
   void sendGuess(int guessNum) {
     if (!isMyTurn || isPunishing) return;
-    game.send('play', '${selfSelectedCard},${guessNum}');
+    game.send('play', '$selfSelectedCard,$guessNum');
     // selfSelectedCard = -1;
     // setState(() {});
   }
@@ -218,7 +212,7 @@ class _GamePageState extends State<GamePage> {
         child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Cards(
+        CardPanel(
           cardList: opponentsCard,
           onTap: onCardTap,
           selectedCard: selfSelectedCard,
@@ -228,7 +222,7 @@ class _GamePageState extends State<GamePage> {
         _buildSelectPanel(),
         _buildInstruction(),
         _buildButtons(),
-        Cards(
+        CardPanel(
           cardList: myCard,
           onTap: onCardTap,
           selectedCard: opponentSelectedCard,
@@ -273,6 +267,6 @@ class _GamePageState extends State<GamePage> {
     if (selfSelectedCard == -1) {
       return Container();
     }
-    return SelectPanel(callback: sendGuess);
+    return SelectionPanel(callback: sendGuess);
   }
 }
