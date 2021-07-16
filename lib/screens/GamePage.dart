@@ -178,16 +178,19 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // TODO Wei: change the app bar to button
       appBar: AppBar(
         title: Text('GameBoard'),
       ),
       body: SafeArea(
         child: Container(
-          color: GAMEBOARD_COLOR,
+        // TODO Wei: change the background color to a background image
+        // color: GAMEBOARD_COLOR,
           child: Center(
             child: Container(
               width: GAMEBOARD_MAX_WIDTH,
-              color: GAMEBOARD_COLOR,
+              // TODO Wei: and here
+              // color: GAMEBOARD_COLOR,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // crossAxisAlignment: CrossAxisAlignment.start,

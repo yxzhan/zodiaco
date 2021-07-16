@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../utils/Configs.dart';
 import 'package:reorderables/reorderables.dart';
@@ -56,6 +57,8 @@ class _CardsState extends State<Cards> {
     double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
+    Image cardImage;
+    String ImageNumber;
 
     for (var i = 0; i < widget.cardLists.length; i++) {
       String cardNum = '';
@@ -65,20 +68,40 @@ class _CardsState extends State<Cards> {
       Color textColor = Colors.white;
       double scale = 1;
       Border borderStyle;
+      ImageNumber = (i + 1).toString() + '.png';
 
       // style of cards are open
       if (widget.cardLists[i]['show'] == 1) {
         cardRotation = 0;
       }
+
+      // TODO Wei: change to card back
+      // TODO Xiang: Change the back-end code for color 'white' and 'black'
+      // 'white' for blue, 'black' for yellow
       // card color
       if (widget.cardLists[i]['color'] == 'white') {
-        bgColor = Colors.white;
-        textColor = Colors.black;
+        // bgColor = Colors.white;
+        // textColor = Colors.black;
+        cardImage = Image.asset("assets/cards-ui/blueback.png");
+
+        // show revealed cards and own cards
+        if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
+          cardImage = Image.asset("assets/cards-ui/b" + ImageNumber);
+        }
+      } else if (widget.cardLists[i]['color'] == 'black') {
+        cardImage = Image.asset("assets/cards-ui02/yellowback.png");
+
+        if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
+          cardImage = Image.asset("assets/cards-ui02/y" + ImageNumber);
+        }
       }
+
       // show number on the card or not
-      if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
-        cardNum = widget.cardLists[i]['display_str'];
-      }
+      // if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
+      //   cardNum = widget.cardLists[i]['display_str'];
+      // }
+
+      // TODO Wei: new style
       // card style when card is selected
       if (widget.selectedCard == i) {
         scale = 1.3;
@@ -96,13 +119,14 @@ class _CardsState extends State<Cards> {
           child: Container(
             width: cardWidth,
             height: cardHeight,
-            decoration: BoxDecoration(color: bgColor, border: borderStyle),
+            // decoration: BoxDecoration(color: bgColor, border: borderStyle),
             margin: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Center(
-              child: Text(
-                cardNum,
-                style: TextStyle(fontSize: 24, color: textColor),
-              ),
+              // child: Text(
+              //   cardNum,
+              //   style: TextStyle(fontSize: 24, color: textColor),
+              // ),
+              child: cardImage,
             ),
           ),
         ),
