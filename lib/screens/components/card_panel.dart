@@ -1,33 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../utils/Configs.dart';
+import '../../utils/configs.dart';
 import 'package:reorderables/reorderables.dart';
 
-class Cards extends StatefulWidget {
+class CardPanel extends StatefulWidget {
   final List<dynamic> cardLists;
-  final Color cardColor;
   final bool isMyCard;
   final Function(int, bool) onTap;
   final Function(int, int) onReorder;
   final int selectedCard;
   final bool isReorderable;
 
-  Cards({
+  CardPanel({
     Key key,
     @required this.cardLists,
     @required this.onTap,
     @required this.selectedCard,
     @required this.isReorderable,
     this.onReorder,
-    this.cardColor = Colors.yellow,
-    this.isMyCard = false,
+    this.isMyCard = false
   }) : super(key: key);
 
+  final List<dynamic> cardList;
+  final Color cardColor;
+  final bool isMyCard;
+  final Function(int, bool) onTap;
+  final Function(int, int) onReorder;
+  final int selectedCard;
+  final bool reorderable;
   @override
-  _CardsState createState() => _CardsState();
+  _CardPanelState createState() => _CardPanelState();
 }
 
-class _CardsState extends State<Cards> {
+class _CardPanelState extends State<CardPanel> {
   @override
   void initState() {
     super.initState();

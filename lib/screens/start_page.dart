@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../networking/GameCommunication.dart';
-import './GamePage.dart';
-import '../utils/Utils.dart';
-import './components/LoadingCircle.dart';
+import '../networking/game_communication.dart';
+import './game_page.dart';
+import '../utils/utils.dart';
+import './components/loading_circle.dart';
 
 class StartPage extends StatefulWidget {
   @override
