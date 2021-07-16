@@ -3,10 +3,16 @@ import '../../utils/configs.dart';
 
 class SelectionPanel extends StatelessWidget {
   final int selectedCard;
+  final List<dynamic> cardLists;
   final Function(int) callback;
   final List<dynamic> allCardValue = [for (var i = 1; i < 13; i += 1) i];
 
-  SelectionPanel({Key key, this.selectedCard, this.callback}) : super(key: key);
+  SelectionPanel({
+    Key key,
+    this.selectedCard,
+    this.cardLists,
+    this.callback,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +22,8 @@ class SelectionPanel extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
         child: Wrap(
           spacing: 0,
-          runSpacing: 16,
+          runSpacing: 16.0,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: _buildCards(context),
         ),
       ),
@@ -27,6 +34,11 @@ class SelectionPanel extends StatelessWidget {
     double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.2;
 
+    String imageDir = CARDS_UI_DIR + 'b';
+    if (cardLists[selectedCard]['color'] == 'black') {
+      imageDir = CARDS_UI_DIR + 'y';
+    }
+
     List<Widget> res = [];
     for (var i = 0; i < allCardValue.length; i++) {
       Widget cardElement;
@@ -36,14 +48,12 @@ class SelectionPanel extends StatelessWidget {
         child: Container(
           width: cardWidth,
           height: cardHeight,
-          decoration:
-              BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
+          // TODO: new style when selected
+          // decoration:
+          //     BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Center(
-            child: Text(
-              cardNum,
-              style: TextStyle(fontSize: 20),
-            ),
+            child: Image.asset(imageDir + (i + 1).toString() + '.png'),
           ),
         ),
       );

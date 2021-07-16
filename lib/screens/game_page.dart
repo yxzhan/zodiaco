@@ -200,15 +200,18 @@ class _GamePageState extends State<GamePage> {
       // );
       playingSign = Text('\'s turn.');
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.person),
-        Text(
-          name,
-        ),
-        playingSign
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.person),
+          Text(
+            name,
+          ),
+          playingSign
+        ],
+      ),
     );
   }
 
@@ -244,7 +247,11 @@ class _GamePageState extends State<GamePage> {
     if (selfSelectedCard == -1) {
       return Container();
     }
-    return SelectionPanel(callback: sendGuess);
+    return SelectionPanel(
+      selectedCard: selfSelectedCard,
+      cardLists: opponentsCards,
+      callback: sendGuess,
+    );
   }
 
   Widget _buildInstruction() {

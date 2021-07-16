@@ -56,7 +56,7 @@ class _CardPanelState extends State<CardPanel> {
     double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
     double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
-    Image cardImage;
+    String imageDir;
     String imageNumber;
 
     for (var i = 0; i < widget.cardLists.length; i++) {
@@ -68,7 +68,6 @@ class _CardPanelState extends State<CardPanel> {
       double scale = 1;
       Border borderStyle;
       imageNumber = widget.cardLists[i]['display_str'];
-      // imageNumber = "1";
 
       // style of cards are open
       if (widget.cardLists[i]['show'] == 1) {
@@ -81,17 +80,17 @@ class _CardPanelState extends State<CardPanel> {
       if (widget.cardLists[i]['color'] == 'white') {
         // bgColor = Colors.white;
         // textColor = Colors.black;
-        cardImage = Image.asset("assets/cards-ui/blueback.png",);
+        imageDir = CARDS_UI_DIR + 'blueback';
 
         // show revealed cards and own cards
         if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
-          cardImage = Image.asset("assets/cards-ui/b" + imageNumber + ".png");
+          imageDir = CARDS_UI_DIR + 'b' + imageNumber;
         }
       } else if (widget.cardLists[i]['color'] == 'black') {
-        cardImage = Image.asset("assets/cards-ui02/yellowback.png");
+        imageDir = CARDS_UI_DIR + 'yellowback';
 
         if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
-          cardImage = Image.asset("assets/cards-ui02/y" + imageNumber + ".png");
+          imageDir = CARDS_UI_DIR + 'y' + imageNumber;
         }
       }
 
@@ -121,7 +120,7 @@ class _CardPanelState extends State<CardPanel> {
             // decoration: BoxDecoration(color: bgColor, border: borderStyle),
             margin: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Center(
-              child: cardImage,
+              child: Image.asset(imageDir + '.png'),
             ),
           ),
         ),
