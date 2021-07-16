@@ -150,6 +150,13 @@ class _GamePageState extends State<GamePage> {
 
   void restartGame() {
     game.send('ready', '');
+    this.showRestartButton = false;
+    setState(() {});
+  }
+
+  void rematchPlayer() {
+    Navigator.of(context).pop();
+    game.send('join', widget.playerName);
   }
 
   void onReorder(int oldIndex, int newIndex) {
@@ -268,11 +275,17 @@ class _GamePageState extends State<GamePage> {
 
   Widget _buildButtons() {
     if (showRestartButton) {
-      return Container(
-        child: ElevatedButton(
-          onPressed: restartGame,
-          child: new Text('Restart'),
-        ),
+      return Row(
+        children: [
+          ElevatedButton(
+            onPressed: restartGame,
+            child: new Text('Play Again'),
+          ),
+          ElevatedButton(
+            onPressed: rematchPlayer,
+            child: new Text('Match other player'),
+          )
+        ],
       );
     }
     if (!showSkipButton) {

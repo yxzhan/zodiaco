@@ -54,7 +54,7 @@ const SPECIALCARD = 1
 const REORDERCOUNTDOWN = 15
 const DEALCARDSIZE = 10
 const CARD_DISPLAY_STRING = {
-  1: 'X',
+  1: '1',
   2: '2',
   3: '3',
   4: '4',
@@ -127,17 +127,30 @@ wsServer.on('request', function (request) {
 
       case 'ready':
         player.state = PLAYERSTATES.ready;
+        player.sendMsg({
+          'action': 'hint_update',
+          'data': 'Ready!'
+        })
+        Players[player.opponentIndex].sendMsg({
+          'action': 'hint_update',
+          'data': `${player.name} is ready.`
+        })
         DealCards(player);
         break;
+
+      // case 'ready':
+      //   player.state = PLAYERSTATES.ready;
+      //   DealCards(player);
+      //   break;
 
       case 'on_reorder':
         player.cards = JSON.parse(message.data)
         break;
-        //
-        // When a player resigns, we need to break the relationship
-        // between the 2 players and notify the other player
-        // that the first one resigned
-        //
+      //
+      // When a player resigns, we need to break the relationship
+      // between the 2 players and notify the other player
+      // that the first one resigned
+      //
       case 'resign':
         Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
           'action': 'resigned'
@@ -145,32 +158,32 @@ wsServer.on('request', function (request) {
         player.opponentIndex = null;
         break;
 
-        //
-        // A player sends a guess
-        //
+      //
+      // A player sends a guess
+      //
       case 'play':
         checkGuess(player, message.data)
         checkGameover(player)
         break;
-        //
-        // A player select a opponent's card
-        //
+      //
+      // A player select a opponent's card
+      //
       case 'select_card':
         Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
           'action': 'select_card',
           'data': message.data
         });
         break;
-        //
-        // A player takes punishment
-        //
+      //
+      // A player takes punishment
+      //
       case 'punish':
         punish(player, message.data)
         checkGameover(player)
         break;
-        //
-        // A player takes punishment
-        //
+      //
+      // A player takes punishment
+      //
       case 'skip':
         // punish(player, message.data)
         switchTurn(player, false)
@@ -301,6 +314,8 @@ function DealCards(player) {
   console.log('New Game')
   specialCardsreorder(player)
 
+  player.state = PLAYERSTATES.playing
+  opponent.state = PLAYERSTATES.playing
 
   // ---------------------------------------------------------
   // Sort cards helper function
@@ -463,7 +478,7 @@ function switchTurn(player, turn) {
     'action': 'select_card',
     'data': '-1'
   });
-  console.log(`${turn ? player.name: opponent.name}\'s turn.`)
+  console.log(`${turn ? player.name : opponent.name}\'s turn.`)
 }
 
 // ---------------------------------------------------------
