@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import '../../utils/configs.dart';
 
 class SelectionPanel extends StatelessWidget {
+  final int selectedCard;
   final Function(int) callback;
   final List<dynamic> allCardValue = [for (var i = 1; i < 13; i += 1) i];
 
-  SelectionPanel({Key key, this.callback}) : super(key: key);
+  SelectionPanel({Key key, this.selectedCard, this.callback}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

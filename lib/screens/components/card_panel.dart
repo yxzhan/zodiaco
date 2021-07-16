@@ -11,23 +11,16 @@ class CardPanel extends StatefulWidget {
   final int selectedCard;
   final bool isReorderable;
 
-  CardPanel({
-    Key key,
-    @required this.cardLists,
-    @required this.onTap,
-    @required this.selectedCard,
-    @required this.isReorderable,
-    this.onReorder,
-    this.isMyCard = false
-  }) : super(key: key);
+  CardPanel(
+      {Key key,
+      @required this.cardLists,
+      @required this.onTap,
+      @required this.selectedCard,
+      @required this.isReorderable,
+      this.onReorder,
+      this.isMyCard = false})
+      : super(key: key);
 
-  final List<dynamic> cardList;
-  final Color cardColor;
-  final bool isMyCard;
-  final Function(int, bool) onTap;
-  final Function(int, int) onReorder;
-  final int selectedCard;
-  final bool reorderable;
   @override
   _CardPanelState createState() => _CardPanelState();
 }
@@ -53,6 +46,7 @@ class _CardPanelState extends State<CardPanel> {
       return Wrap(
         spacing: 8.0,
         runSpacing: 16.0,
+        alignment: WrapAlignment.center,
         children: _buildCards(),
       );
     }
@@ -63,7 +57,7 @@ class _CardPanelState extends State<CardPanel> {
     double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
     Image cardImage;
-    String ImageNumber;
+    String imageNumber;
 
     for (var i = 0; i < widget.cardLists.length; i++) {
       String cardNum = '';
@@ -73,31 +67,31 @@ class _CardPanelState extends State<CardPanel> {
       Color textColor = Colors.white;
       double scale = 1;
       Border borderStyle;
-      ImageNumber = (i + 1).toString() + '.png';
+      imageNumber = widget.cardLists[i]['display_str'];
+      // imageNumber = "1";
 
       // style of cards are open
       if (widget.cardLists[i]['show'] == 1) {
         cardRotation = 0;
       }
 
-      // TODO Wei: change to card back
       // TODO Xiang: Change the back-end code for color 'white' and 'black'
       // 'white' for blue, 'black' for yellow
       // card color
       if (widget.cardLists[i]['color'] == 'white') {
         // bgColor = Colors.white;
         // textColor = Colors.black;
-        cardImage = Image.asset("assets/cards-ui/blueback.png");
+        cardImage = Image.asset("assets/cards-ui/blueback.png",);
 
         // show revealed cards and own cards
         if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
-          cardImage = Image.asset("assets/cards-ui/b" + ImageNumber);
+          cardImage = Image.asset("assets/cards-ui/b" + imageNumber + ".png");
         }
       } else if (widget.cardLists[i]['color'] == 'black') {
         cardImage = Image.asset("assets/cards-ui02/yellowback.png");
 
         if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
-          cardImage = Image.asset("assets/cards-ui02/y" + ImageNumber);
+          cardImage = Image.asset("assets/cards-ui02/y" + imageNumber + ".png");
         }
       }
 
@@ -123,14 +117,10 @@ class _CardPanelState extends State<CardPanel> {
           onTap: () => {widget.onTap(i, widget.isMyCard)},
           child: Container(
             width: cardWidth,
-            height: cardHeight,
+            // height: cardHeight,
             // decoration: BoxDecoration(color: bgColor, border: borderStyle),
             margin: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Center(
-              // child: Text(
-              //   cardNum,
-              //   style: TextStyle(fontSize: 24, color: textColor),
-              // ),
               child: cardImage,
             ),
           ),

@@ -67,7 +67,7 @@ class _StartPageState extends State<StartPage> {
             context,
             new MaterialPageRoute(
               builder: (BuildContext context) => GamePage(
-                myName: playerName, // Name of the opponent
+                playerName: playerName, // Name of the opponent
                 opponentName: message["data"], // Name of the opponent
               ),
             ));
