@@ -107,7 +107,7 @@ wsServer.on('request', function (request) {
     // Process the requested action
     //
     var message = JSON.parse(data.utf8Data);
-    console.log(message)
+    console.log(player.name, message)
 
     if (message.action != 'join' && player.state == PLAYERSTATES.uninitialized) return
     switch (message.action) {
@@ -118,11 +118,10 @@ wsServer.on('request', function (request) {
       //
       case 'join':
         player.name = message.data;
-        player.state = PLAYERSTATES.matching;
         player.sendMsg({
           'action': 'matching_player'
         });
-        MatchPlayer();
+        MatchPlayer(player);
         break;
 
       case 'ready':
@@ -152,10 +151,7 @@ wsServer.on('request', function (request) {
       // that the first one resigned
       //
       case 'resign':
-        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
-          'action': 'resigned'
-        });
-        player.opponentIndex = null;
+        Resign(player)
         break;
 
       //
@@ -255,27 +251,39 @@ function BroadcastPlayersList() {
 // ---------------------------------------------------------
 // Match players
 // ---------------------------------------------------------
-function MatchPlayer() {
-  let matchingList = Players.filter(player => player.state === PLAYERSTATES.matching).slice(0, 2)
-  if (matchingList.length != 2) return
+function MatchPlayer(player) {
+  player.state = PLAYERSTATES.matching;
+  let opponent = Players.find(p => p.state === PLAYERSTATES.matching && p.id !== player.id)
+  if (!opponent) return
 
-  let firstPlayer = matchingList[0]
-  let secondPlayer = matchingList[1]
+  player.state = PLAYERSTATES.matched
+  opponent.state = PLAYERSTATES.matched
 
-  firstPlayer.state = PLAYERSTATES.matched
-  secondPlayer.state = PLAYERSTATES.matched
+  player.setOpponent(opponent.id)
+  opponent.setOpponent(player.id)
 
-  firstPlayer.setOpponent(secondPlayer.id)
-  secondPlayer.setOpponent(firstPlayer.id)
-
-  firstPlayer.sendMsg({
+  player.sendMsg({
     'action': 'new_game',
-    'data': secondPlayer.name
+    'data': opponent.name
   })
-  secondPlayer.sendMsg({
+  opponent.sendMsg({
     'action': 'new_game',
-    'data': firstPlayer.name
+    'data': player.name
   })
+}
+
+function Resign(player) {
+  let opponent = Players[player.opponentIndex]
+  player.opponentIndex = null;
+  clearInterval(player.counter)
+
+  if (opponent) {
+    opponent.sendMsg({
+      'action': 'resigned'
+    });
+    opponent.opponentIndex = null;
+    clearInterval(opponent.counter)
+  }
 }
 
 // ---------------------------------------------------------
@@ -386,6 +394,8 @@ function specialCardsreorder(player) {
   let countDownSecond = REORDERCOUNTDOWN
   let counter = setInterval(_countDown, 1000)
   _countDown()
+  player.counter = counter
+  opponent.counter = counter
 
   function _countDown() {
     let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have them),

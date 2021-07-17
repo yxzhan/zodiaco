@@ -41,7 +41,6 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void dispose() {
-    game.send('resign', '');
     game.removeListener(_onAction);
     super.dispose();
   }
@@ -57,7 +56,7 @@ class _GamePageState extends State<GamePage> {
       /// The opponent resigned, so let's leave this screen
       ///
       case 'resigned':
-        Navigator.of(context).pop();
+        Navigator.pop(context);
         break;
 
       ///
@@ -155,8 +154,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void rematchPlayer() {
-    Navigator.of(context).pop();
-    game.send('join', widget.playerName);
+    Navigator.pop(context, 'rematch');
   }
 
   void onReorder(int oldIndex, int newIndex) {
