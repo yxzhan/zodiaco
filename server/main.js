@@ -131,7 +131,7 @@ wsServer.on('request', function (request) {
           'action': 'hint_update',
           'data': 'Ready!'
         })
-        Players[player.opponentIndex].sendMsg({
+        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
           'action': 'hint_update',
           'data': `${player.name} is ready.`
         })
@@ -283,6 +283,8 @@ function MatchPlayer() {
 // ---------------------------------------------------------
 function DealCards(player) {
   let opponent = Players[player.opponentIndex]
+  if (!opponent) return
+
   // wait until opponent ready
   if (opponent.state != PLAYERSTATES.ready) return
   // Generate cards
@@ -367,6 +369,7 @@ function DealCards(player) {
 // ---------------------------------------------------------
 function specialCardsreorder(player) {
   let opponent = Players[player.opponentIndex]
+  if (!opponent) return
 
   function _reorderControl(val) {
     player.sendMsg({
@@ -413,6 +416,8 @@ function specialCardsreorder(player) {
 // ---------------------------------------------------------
 function checkGameover(player) {
   let opponent = Players[player.opponentIndex]
+  if (!opponent) return
+
   // check if one of the player's cards are all unfolded
   if (_isAllCardsUnfolded(player.cards)) {
     _sendResultMsg(opponent)
@@ -454,6 +459,7 @@ function checkGameover(player) {
 // ---------------------------------------------------------
 function switchTurn(player, turn) {
   let opponent = Players[player.opponentIndex]
+  if (!opponent) return
   let turnHint = 'Your turn! Click opponent\'s card and guess the number.'
   let waitHint = '\'s turn.'
   player.sendMsg({
@@ -486,6 +492,8 @@ function switchTurn(player, turn) {
 // ---------------------------------------------------------
 function checkGuess(player, data) {
   let opponent = Players[player.opponentIndex]
+  if (!opponent) return
+
   let index = parseInt(data.split(',')[0])
   let guessNum = parseInt(data.split(',')[1])
   if (guessNum == opponent.cards[index]['value']) {
@@ -539,6 +547,7 @@ function punish(player, data) {
 // ---------------------------------------------------------
 function updateCards(player, displayOpponentCards = true) {
   let opponent = Players[player.opponentIndex]
+  if (!opponent) return
   player.sendMsg({
     'action': 'cards_update',
     'data': {
