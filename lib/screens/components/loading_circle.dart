@@ -47,6 +47,8 @@ class _LoadingCircleState extends State<LoadingCircle>
       child: SizedBox(
         child: CircularProgressIndicator(
           value: controller.value,
+          valueColor: new AlwaysStoppedAnimation<Color>(
+              Color.fromARGB(255, 223, 140, 0)),
           semanticsLabel: 'Linear progress indicator',
         ),
         height: widget.size,
