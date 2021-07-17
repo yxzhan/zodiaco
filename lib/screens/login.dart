@@ -134,35 +134,21 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: 20,
+                height: 60,
                 width: 100,
               ),
-              Text(
-                'Zodiaco',
-                style: TextStyle(
-                    decoration: TextDecoration.none,
-                    fontFamily: 'Kefa',
-                    fontSize: 40,
-                    color: Colors.white),
-              ),
-
               //space for gif
               Center(
                   child: Container(
                       height: 200,
                       width: 200,
-                      child: CircleAvatar(
-                        child: ClipOval(
-                          child: Image.asset("assets/12anim.gif"),
-                        ),
-                        backgroundColor: Colors.white,
-                      ))),
+                      child: Image.asset("assets/12anim.gif"))),
 
               //just for vertical spacing
-              SizedBox(
-                height: 60,
-                width: 10,
-              ),
+              // SizedBox(
+              //   height: 5,
+              //   width: 10,
+              // ),
               Text(
                 'Online Players: ' + playersListLength,
                 style: TextStyle(
@@ -170,10 +156,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontFamily: 'Kefa',
                     fontSize: 15,
                     color: Colors.white),
-              ),
-              SizedBox(
-                height: 10,
-                width: 10,
               ),
               //container for textfields user name and password
               Container(
@@ -204,10 +186,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: EdgeInsets.only(top: 20),
                 child: Button(text: 'PLAY', onPressed: onPressed),
               ),
-              SizedBox(
-                height: 20,
-                width: 10,
-              ),
+              // SizedBox(
+              //   height: 20,
+              //   width: 10,
+              // ),
               Container(
                 height: 50,
                 width: 200,
@@ -217,19 +199,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: Column(
                   children: <Widget>[
-                    // TODO: Should not be a Text form Field
-                    TextFormField(
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "HOW TO PLAY",
-                        hintStyle: TextStyle(
+                    Container(
+                      height: 50,
+                      width: 200,
+                      child: GestureDetector(
+                        onTap: (
+                            //todo ad new page.......
+                            ) {},
+                        child: Text(
+                          'HOW TO PLAY',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
                             fontFamily: 'Kefa',
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 223, 140, 0)),
-                        // contentPadding: EdgeInsets.symmetric(horizontal: (1))
+                            color: Color.fromARGB(255, 223, 140, 0),
+                          ),
+                        ),
                       ),
+                      // child: Text(
+                      //   textAlign: TextAlign.center,
+                      //   decoration: InputDecoration(
+                      //     border: InputBorder.none,
+                      //     hintText: "HOW TO PLAY",
+                      //     hintStyle: TextStyle(
+                      //         fontFamily: 'Kefa',
+                      //         fontSize: 16.0,
+                      //         fontWeight: FontWeight.bold,
+                      //         color: Color.fromARGB(255, 223, 140, 0)),
+                      //     // contentPadding: EdgeInsets.symmetric(horizontal: (1))
+                      //   ),
+                      // ),
                     )
                   ],
                 ),
