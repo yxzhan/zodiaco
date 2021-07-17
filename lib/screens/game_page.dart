@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:zodiaco/screens/components/Button.dart';
 import '../networking/game_communication.dart';
 import './components/card_panel.dart';
 import './components/selection_panel.dart';
@@ -299,14 +300,8 @@ class _GamePageState extends State<GamePage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ElevatedButton(
-            onPressed: restartGame,
-            child: new Text('Play Again'),
-          ),
-          ElevatedButton(
-            onPressed: rematchPlayer,
-            child: new Text('Match other player'),
-          )
+          Button(text: 'Play Again', onPressed: restartGame),
+          Button(text: 'Next Game', onPressed: rematchPlayer),
         ],
       );
     }
@@ -314,10 +309,7 @@ class _GamePageState extends State<GamePage> {
       return Container();
     }
     return Container(
-      child: ElevatedButton(
-        onPressed: skipRound,
-        child: new Text('Skip'),
-      ),
+      child: Button(text: 'Skip', onPressed: skipRound),
     );
   }
 }

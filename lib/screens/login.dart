@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './components/Button.dart';
+import './components/button.dart';
 import '../networking/game_communication.dart';
 import './game_page.dart';
 import '../utils/utils.dart';
