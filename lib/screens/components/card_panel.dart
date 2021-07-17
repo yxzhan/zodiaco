@@ -35,6 +35,22 @@ class _CardPanelState extends State<CardPanel> {
     super.initState();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    // TODO: IS MY CARD? EFFECT
+
+    return Card(
+      color: _buildInteractiveHint(),
+      shadowColor: Colors.black,
+      elevation: 10.0,
+      // margin: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: _buildWrap(),
+      ),
+    );
+  }
+
   // color, shadowColor, elevation in Card
   Color _buildInteractiveHint() {
     if (widget.isMyTurn) {
@@ -50,25 +66,8 @@ class _CardPanelState extends State<CardPanel> {
         }
       }
     }
-
     // not my turn, highlight nothing
     return Colors.white24;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: IS MY CARD? EFFECT
-
-    return Card(
-      color: _buildInteractiveHint(),
-      shadowColor: Colors.black,
-      elevation: 10.0,
-      // margin: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: _buildWrap(),
-      ),
-    );
   }
 
   Widget _buildWrap() {

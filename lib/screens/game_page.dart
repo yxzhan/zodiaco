@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../networking/game_communication.dart';
 import './components/card_panel.dart';
@@ -208,24 +209,20 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _buildPlayerInfo(String name, bool isPlaying) {
-    Widget playingSign = Container();
+    // Widget playingSign = Container();
+    Color color = Colors.grey;
     if (isPlaying) {
-      // playingSign = LoadingCircle(
-      //   size: 10.0,
-      //   duration: 2,
-      // );
-      playingSign = Text('\'s turn');
+      // playingSign = Text('\'s turn');
+      color = Colors.white;
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.person),
-          Text(
-            name,
-          ),
-          playingSign
+          Icon(Icons.person, color: color),
+          Text(name, style: TextStyle(color: color)),
+          // playingSign
         ],
       ),
     );
@@ -245,6 +242,7 @@ class _GamePageState extends State<GamePage> {
             isReorderable: false,
             isPunishing: isPunishing,
           ),
+          // TODO: wrap the three following widgets together
           _buildSelectionPanel(),
           _buildInstruction(),
           _buildButtons(),
@@ -289,6 +287,7 @@ class _GamePageState extends State<GamePage> {
   Widget _buildButtons() {
     if (showRestartButton) {
       return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           ElevatedButton(
             onPressed: restartGame,
