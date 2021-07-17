@@ -177,11 +177,20 @@ class _GamePageState extends State<GamePage> {
       body: SafeArea(
         child: Container(
           // color: GAMEBOARD_COLOR,
+          decoration: BoxDecoration(
+            // a background image
+            image: DecorationImage(
+              image: AssetImage(IMAGE_DIR + 'loginbg.png'),
+              // cover the entire screen -> a full background image
+              fit: BoxFit.cover,
+            ),
+          ),
           child: Center(
             child: Container(
               // TODO: change the game board size
               width: GAMEBOARD_MAX_WIDTH,
-              color: GAMEBOARD_COLOR,
+              // width: 400.0,
+              // color: GAMEBOARD_COLOR,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,10 +214,10 @@ class _GamePageState extends State<GamePage> {
       //   size: 10.0,
       //   duration: 2,
       // );
-      playingSign = Text('\'s turn.');
+      playingSign = Text('\'s turn');
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

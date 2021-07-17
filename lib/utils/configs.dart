@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const double GAMEBOARD_MAX_WIDTH = 375;
 const Color GAMEBOARD_COLOR = Colors.greenAccent;
 const String CARDS_UI_DIR = 'assets/cards-ui/';
+const String IMAGE_DIR = 'assets/images/';
 
 ///
 /// Put your WebSockets server IP address and port number
