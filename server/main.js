@@ -107,7 +107,7 @@ wsServer.on('request', function (request) {
     // Process the requested action
     //
     var message = JSON.parse(data.utf8Data);
-    console.log(message)
+    console.log(player.name, message)
 
     if (message.action != 'join' && player.state == PLAYERSTATES.uninitialized) return
     switch (message.action) {
@@ -151,10 +151,7 @@ wsServer.on('request', function (request) {
       // that the first one resigned
       //
       case 'resign':
-        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
-          'action': 'resigned'
-        });
-        player.opponentIndex = null;
+        Resign(player)
         break;
 
       //
@@ -275,6 +272,20 @@ function MatchPlayer(player) {
   })
 }
 
+function Resign(player) {
+  let opponent = Players[player.opponentIndex]
+  player.opponentIndex = null;
+  clearInterval(player.counter)
+
+  if (opponent) {
+    opponent.sendMsg({
+      'action': 'resigned'
+    });
+    opponent.opponentIndex = null;
+    clearInterval(opponent.counter)
+  }
+}
+
 // ---------------------------------------------------------
 // Deal cards
 // ---------------------------------------------------------
@@ -383,6 +394,8 @@ function specialCardsreorder(player) {
   let countDownSecond = REORDERCOUNTDOWN
   let counter = setInterval(_countDown, 1000)
   _countDown()
+  player.counter = counter
+  opponent.counter = counter
 
   function _countDown() {
     let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have them),
