@@ -11,7 +11,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  int playersListLength = 0;
+  String playersListLength = 'connecting to server...';
   String playerName = '';
   String gameState = '';
   static final TextEditingController _name = new TextEditingController();
@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ///   * record amount of online players
       ///
       case "players_list":
-        playersListLength = message["data"];
+        playersListLength = message["data"].toString();
         // force rebuild
         setState(() {});
         break;
@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(30),
               child: LoadingCircle(),
             ),
             Text(
@@ -117,10 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             ),
-            // Text('Welcome ' + game.playerName),
-            // Text('Matching Player...'),
             Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(20),
                 child: Button(text: 'Cancel', onPressed: cancelMatching)),
           ]),
     );
@@ -166,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 10,
               ),
               Text(
-                'Online Players: ' + playersListLength.toString(),
+                'Online Players: ' + playersListLength,
                 style: TextStyle(
                     decoration: TextDecoration.none,
                     fontFamily: 'Kefa',
