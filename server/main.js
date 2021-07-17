@@ -118,11 +118,10 @@ wsServer.on('request', function (request) {
       //
       case 'join':
         player.name = message.data;
-        player.state = PLAYERSTATES.matching;
         player.sendMsg({
           'action': 'matching_player'
         });
-        MatchPlayer();
+        MatchPlayer(player);
         break;
 
       case 'ready':
@@ -255,26 +254,24 @@ function BroadcastPlayersList() {
 // ---------------------------------------------------------
 // Match players
 // ---------------------------------------------------------
-function MatchPlayer() {
-  let matchingList = Players.filter(player => player.state === PLAYERSTATES.matching).slice(0, 2)
-  if (matchingList.length != 2) return
+function MatchPlayer(player) {
+  player.state = PLAYERSTATES.matching;
+  let opponent = Players.find(p => p.state === PLAYERSTATES.matching && p.id !== player.id)
+  if (!opponent) return
 
-  let firstPlayer = matchingList[0]
-  let secondPlayer = matchingList[1]
+  player.state = PLAYERSTATES.matched
+  opponent.state = PLAYERSTATES.matched
 
-  firstPlayer.state = PLAYERSTATES.matched
-  secondPlayer.state = PLAYERSTATES.matched
+  player.setOpponent(opponent.id)
+  opponent.setOpponent(player.id)
 
-  firstPlayer.setOpponent(secondPlayer.id)
-  secondPlayer.setOpponent(firstPlayer.id)
-
-  firstPlayer.sendMsg({
+  player.sendMsg({
     'action': 'new_game',
-    'data': secondPlayer.name
+    'data': opponent.name
   })
-  secondPlayer.sendMsg({
+  opponent.sendMsg({
     'action': 'new_game',
-    'data': firstPlayer.name
+    'data': player.name
   })
 }
 
