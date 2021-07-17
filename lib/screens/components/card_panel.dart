@@ -11,6 +11,7 @@ class CardPanel extends StatefulWidget {
   final Function(int, int) onReorder;
   final int selectedCard;
   final bool isReorderable;
+  final bool isPunishing;
 
   CardPanel({
     Key key,
@@ -21,6 +22,7 @@ class CardPanel extends StatefulWidget {
     this.onReorder,
     this.isMyCard = false,
     this.isMyTurn,
+    this.isPunishing,
   }) : super(key: key);
 
   @override
@@ -33,10 +35,32 @@ class _CardPanelState extends State<CardPanel> {
     super.initState();
   }
 
+  // color, shadowColor, elevation in Card
+  Color _buildInteractiveHint() {
+    if (widget.isMyTurn) {
+      if (widget.isPunishing) {
+        // my turn on choosing, highlight my cards
+        if (widget.isMyCard) {
+          return Colors.white;
+        }
+      } else {
+        // my turn on being punished, highlight opponent's cards
+        if (!widget.isMyCard) {
+          return Colors.white;
+        }
+      }
+    }
+
+    // not my turn, highlight nothing
+    return Colors.white24;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // TODO: IS MY CARD? EFFECT
+
     return Card(
-      color: Colors.white24,
+      color: _buildInteractiveHint(),
       shadowColor: Colors.black,
       elevation: 10.0,
       // margin: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
