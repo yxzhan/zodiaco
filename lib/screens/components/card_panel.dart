@@ -6,20 +6,24 @@ import 'package:reorderables/reorderables.dart';
 class CardPanel extends StatefulWidget {
   final List<dynamic> cardLists;
   final bool isMyCard;
+  final bool isMyTurn;
   final Function(int, bool) onTap;
   final Function(int, int) onReorder;
   final int selectedCard;
   final bool isReorderable;
+  final bool isPunishing;
 
-  CardPanel(
-      {Key key,
-      @required this.cardLists,
-      @required this.onTap,
-      @required this.selectedCard,
-      @required this.isReorderable,
-      this.onReorder,
-      this.isMyCard = false})
-      : super(key: key);
+  CardPanel({
+    Key key,
+    @required this.cardLists,
+    @required this.onTap,
+    @required this.selectedCard,
+    @required this.isReorderable,
+    this.onReorder,
+    this.isMyCard = false,
+    this.isMyTurn,
+    this.isPunishing,
+  }) : super(key: key);
 
   @override
   _CardPanelState createState() => _CardPanelState();
@@ -33,19 +37,58 @@ class _CardPanelState extends State<CardPanel> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: IS MY CARD? EFFECT
+
+    return Card(
+      color: _buildInteractiveHint(),
+      shadowColor: Colors.black,
+      elevation: 10.0,
+      // margin: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: _buildWrap(),
+      ),
+    );
+  }
+
+  // color, shadowColor, elevation in Card
+  Color _buildInteractiveHint() {
+    if (widget.isMyTurn) {
+      if (widget.isPunishing) {
+        // my turn on choosing, highlight my cards
+        if (widget.isMyCard) {
+          return Colors.white;
+        }
+      } else {
+        // my turn on being punished, highlight opponent's cards
+        if (!widget.isMyCard) {
+          return Colors.white;
+        }
+      }
+    }
+    // not my turn, highlight nothing
+    return Colors.white24;
+  }
+
+  Widget _buildWrap() {
     if (widget.isReorderable) {
       return ReorderableWrap(
-        spacing: 8.0,
-        runSpacing: 16.0,
-        padding: const EdgeInsets.all(8),
+        spacing: 16.0,
+        runSpacing: 8.0,
+        // padding: const EdgeInsets.all(8),
         crossAxisAlignment: WrapCrossAlignment.center,
         onReorder: widget.onReorder,
         children: _buildCards(),
       );
     } else {
+      // TODO: effect
+      // if (widget.isMyTurn){
+      //   Widget background;
+      // }
+
       return Wrap(
-        spacing: 8.0,
-        runSpacing: 16.0,
+        spacing: 16.0,
+        runSpacing: 8.0,
         alignment: WrapAlignment.center,
         children: _buildCards(),
       );
@@ -60,17 +103,14 @@ class _CardPanelState extends State<CardPanel> {
     String imageNumber;
 
     for (var i = 0; i < widget.cardLists.length; i++) {
-      String cardNum = '';
       Widget cardElement;
       double cardRotation = 0.8;
-      Color bgColor = Colors.black;
-      Color textColor = Colors.white;
       double scale = 1;
       Border borderStyle;
       imageNumber = widget.cardLists[i]['display_str'];
 
       // style of cards are open
-      if (widget.cardLists[i]['show'] == 1) {
+      if (widget.cardLists[i]['show'] == 1 || widget.isReorderable) {
         cardRotation = 0;
       }
 
@@ -78,8 +118,6 @@ class _CardPanelState extends State<CardPanel> {
       // 'white' for blue, 'black' for yellow
       // card color
       if (widget.cardLists[i]['color'] == 'white') {
-        // bgColor = Colors.white;
-        // textColor = Colors.black;
         imageDir = CARDS_UI_DIR + 'blueback';
 
         // show revealed cards and own cards
@@ -94,16 +132,11 @@ class _CardPanelState extends State<CardPanel> {
         }
       }
 
-      // show number on the card or not
-      // if (widget.cardLists[i]['show'] == 1 || widget.isMyCard) {
-      //   cardNum = widget.cardLists[i]['display_str'];
-      // }
-
       // TODO Wei: new style
       // card style when card is selected
       if (widget.selectedCard == i) {
         scale = 1.3;
-        borderStyle = Border.all(color: Colors.yellow, width: 2);
+        borderStyle = Border.all(color: Colors.white, width: 2);
       }
 
       cardElement = Transform(
@@ -112,14 +145,15 @@ class _CardPanelState extends State<CardPanel> {
           ..setEntry(3, 2, 0.01)
           ..rotateX(cardRotation)
           ..scale(scale),
-        child: GestureDetector(
-          onTap: () => {widget.onTap(i, widget.isMyCard)},
-          child: Container(
-            width: cardWidth,
-            // height: cardHeight,
-            // decoration: BoxDecoration(color: bgColor, border: borderStyle),
-            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Center(
+        child: Card(
+          elevation: 10.0,
+          child: GestureDetector(
+            onTap: () => {widget.onTap(i, widget.isMyCard)},
+            child: Container(
+              width: cardWidth,
+              // height: cardHeight,
+              decoration: BoxDecoration(border: borderStyle),
+              // margin: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Image.asset(imageDir + '.png'),
             ),
           ),
