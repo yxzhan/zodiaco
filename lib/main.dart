@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:zodiaco/screens/login.dart';
-import 'screens/start_page.dart';
 
 void main() {
   runApp(MyApp());
