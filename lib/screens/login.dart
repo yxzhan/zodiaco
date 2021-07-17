@@ -36,7 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: TextDecoration.none,
                   fontFamily: 'Kefa',
                   fontSize: 40,
-                  color: Colors.white),
+                  fontWeight:FontWeight.bold,
+                  color: const Color.fromARGB(255, 223, 140, 0)),
             ),
 
             //just for vertical spacing
