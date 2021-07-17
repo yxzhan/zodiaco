@@ -110,7 +110,7 @@ class _CardPanelState extends State<CardPanel> {
       imageNumber = widget.cardLists[i]['display_str'];
 
       // style of cards are open
-      if (widget.cardLists[i]['show'] == 1) {
+      if (widget.cardLists[i]['show'] == 1 || widget.isReorderable) {
         cardRotation = 0;
       }
 

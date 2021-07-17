@@ -243,9 +243,7 @@ class _GamePageState extends State<GamePage> {
             isPunishing: isPunishing,
           ),
           // TODO: wrap the three following widgets together
-          _buildSelectionPanel(),
-          _buildInstruction(),
-          _buildButtons(),
+          _buildInfoPanel(),
           CardPanel(
             cardLists: myCards,
             onTap: onCardTap,
@@ -258,6 +256,17 @@ class _GamePageState extends State<GamePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoPanel() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildSelectionPanel(),
+        _buildInstruction(),
+        _buildButtons(),
+      ],
     );
   }
 
@@ -275,10 +284,11 @@ class _GamePageState extends State<GamePage> {
   Widget _buildInstruction() {
     return Container(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
         child: Text(
           gameHints,
           textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 20.0, color: Colors.white),
         ),
       ),
     );
