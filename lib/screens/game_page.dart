@@ -180,19 +180,23 @@ class _GamePageState extends State<GamePage> {
     setState(() {});
   }
 
+  void quitGame() {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('GameBoard'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('GameBoard'),
+      // ),
       body: SafeArea(
         child: Container(
           // color: GAMEBOARD_COLOR,
           decoration: BoxDecoration(
             // a background image
             image: DecorationImage(
-              image: AssetImage(IMAGE_DIR + 'loginbg.png'),
+              image: AssetImage(IMAGE_DIR + 'gamebg.png'),
               // cover the entire screen -> a full background image
               fit: BoxFit.cover,
             ),
@@ -207,9 +211,19 @@ class _GamePageState extends State<GamePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _buildPlayerInfo(widget.opponentName, !isMyTurn),
+                  _buildPlayerInfo(
+                    widget.opponentName,
+                    !isMyTurn,
+                    _buildQuitButton(),
+                    Container(),
+                  ),
                   _buildGameBoard(),
-                  _buildPlayerInfo(widget.playerName, isMyTurn)
+                  _buildPlayerInfo(
+                    widget.playerName,
+                    isMyTurn,
+                    Container(),
+                    _buildQuitButton(),
+                  )
                 ],
               ),
             ),
@@ -219,7 +233,8 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Widget _buildPlayerInfo(String name, bool isPlaying) {
+  Widget _buildPlayerInfo(
+      String name, bool isPlaying, Widget leftWidget, Widget rightWidget) {
     // Widget playingSign = Container();
     Color color = Colors.grey;
     if (isPlaying) {
@@ -229,13 +244,31 @@ class _GamePageState extends State<GamePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(Icons.person, color: color),
-          Text(name, style: TextStyle(color: color)),
-          // playingSign
+          leftWidget,
+          Row(
+            // mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Icon(Icons.person, color: color),
+              Text(name, style: TextStyle(color: color)),
+              // playingSign
+            ],
+          ),
+          rightWidget,
         ],
       ),
+    );
+  }
+
+  Widget _buildQuitButton() {
+    return IconButton(
+      onPressed: quitGame,
+      constraints: BoxConstraints(),
+      // remove all the padding
+      icon: Icon(Icons.arrow_back),
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
     );
   }
 

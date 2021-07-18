@@ -37,10 +37,11 @@ class _CardPanelState extends State<CardPanel> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: IS MY CARD? EFFECT
+    List<dynamic> styles = _buildInteractiveHint();
 
     return Card(
-      color: _buildInteractiveHint(),
+      shape: styles[0],
+      color: styles[1],
       shadowColor: Colors.black,
       elevation: 10.0,
       // margin: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
@@ -52,22 +53,40 @@ class _CardPanelState extends State<CardPanel> {
   }
 
   // color, shadowColor, elevation in Card
-  Color _buildInteractiveHint() {
+  List<dynamic> _buildInteractiveHint() {
     if (widget.isMyTurn) {
       if (widget.isPunishing) {
         // my turn on choosing, highlight my cards
         if (widget.isMyCard) {
-          return Colors.white;
+          return [
+            new RoundedRectangleBorder(
+              side: new BorderSide(
+                color: Color.fromARGB(255, 142, 65, 99),
+                width: 4.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            Color.fromARGB(255, 227, 239, 248)
+          ];
         }
       } else {
         // my turn on being punished, highlight opponent's cards
         if (!widget.isMyCard) {
-          return Colors.white;
+          return [
+            new RoundedRectangleBorder(
+              side: new BorderSide(
+                color: Color.fromARGB(255, 142, 65, 99),
+                width: 4.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            Color.fromARGB(255, 227, 239, 248)
+          ];
         }
       }
     }
     // not my turn, highlight nothing
-    return Colors.white24;
+    return [null, Colors.white24];
   }
 
   Widget _buildWrap() {

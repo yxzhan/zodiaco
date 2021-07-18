@@ -79,6 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void cancelMatching() {
+    game.send('resign', '');
     gameState = '';
     setState(() {});
   }
