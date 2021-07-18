@@ -45,7 +45,7 @@ class _CardPanelState extends State<CardPanel> {
       elevation: 10.0,
       // margin: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
         child: _buildWrap(),
       ),
     );

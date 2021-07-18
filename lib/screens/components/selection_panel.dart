@@ -17,9 +17,12 @@ class SelectionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
         child: Wrap(
           spacing: 0,
           runSpacing: 16.0,
