@@ -54,7 +54,7 @@ const SPECIALCARD = 1
 const REORDERCOUNTDOWN = 15
 const DEALCARDSIZE = 10
 const CARD_DISPLAY_STRING = {
-  1: '1',
+  1: 'A',
   2: '2',
   3: '3',
   4: '4',
