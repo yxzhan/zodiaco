@@ -189,6 +189,7 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(38, 50, 56, 1),
       // appBar: AppBar(
       //   title: Text('GameBoard'),
       // ),
