@@ -180,7 +180,7 @@ class _GamePageState extends State<GamePage> {
           decoration: BoxDecoration(
             // a background image
             image: DecorationImage(
-              image: AssetImage(IMAGE_DIR + 'loginbg.png'),
+              image: AssetImage(IMAGE_DIR + 'gamebg.png'),
               // cover the entire screen -> a full background image
               fit: BoxFit.cover,
             ),
