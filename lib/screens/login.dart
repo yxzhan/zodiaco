@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zodiaco/screens/components/how_to_play_dialog.dart';
 import './components/button.dart';
 import '../networking/game_communication.dart';
 import './game_page.dart';
@@ -214,10 +215,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 200,
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) => HowToPlay()),
+                          showDialog<void>(
+                            context: context,
+                            barrierDismissible: false, // user must tap button!
+                            builder: (BuildContext context) {
+                              return HowToPlayDialog();
+                            },
                           );
                         },
                         child: Text(
