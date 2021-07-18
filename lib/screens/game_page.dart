@@ -58,7 +58,19 @@ class _GamePageState extends State<GamePage> {
       /// The opponent resigned, so let's leave this screen
       ///
       case 'resigned':
-        Navigator.pop(context);
+        showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  title: const Text('AlertDialog Title'),
+                  content: const Text('AlertDialog description'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ));
+        // Navigator.pop(context);
         break;
 
       ///
@@ -217,7 +229,7 @@ class _GamePageState extends State<GamePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment:MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Icon(Icons.person, color: color),
           Text(name, style: TextStyle(color: color)),
