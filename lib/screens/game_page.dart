@@ -217,7 +217,7 @@ class _GamePageState extends State<GamePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment:MainAxisAlignment.end,
         children: [
           Icon(Icons.person, color: color),
           Text(name, style: TextStyle(color: color)),
@@ -241,7 +241,6 @@ class _GamePageState extends State<GamePage> {
             isReorderable: false,
             isPunishing: isPunishing,
           ),
-          // TODO: wrap the three following widgets together
           _buildInfoPanel(),
           CardPanel(
             cardLists: myCards,
@@ -283,7 +282,7 @@ class _GamePageState extends State<GamePage> {
   Widget _buildInstruction() {
     return Container(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
         child: Text(
           gameHints,
           textAlign: TextAlign.center,
