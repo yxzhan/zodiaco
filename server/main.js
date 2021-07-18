@@ -241,13 +241,19 @@ Player.prototype = {
 // ---------------------------------------------------------
 // Routine to broadcast the list of all players to everyone
 // ---------------------------------------------------------
+let BroadcaseTimer = null
 function BroadcastPlayersList() {
-  Players.forEach(function (player) {
-    player.sendMsg({
-      'action': 'players_list',
-      'data': Players.length
+  if (BroadcaseTimer) {
+    clearTimeout(BroadcaseTimer)
+  }
+  BroadcaseTimer = setTimeout(_ => {
+    Players.forEach(function (player) {
+      player.sendMsg({
+        'action': 'players_list',
+        'data': Players.length
+      });
     });
-  });
+  }, 1000)
 }
 
 // ---------------------------------------------------------
