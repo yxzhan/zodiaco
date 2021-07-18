@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:zodiaco/screens/components/Button.dart';
+import 'package:zodiaco/screens/components/how_to_play_dialog.dart';
 import '../networking/game_communication.dart';
 import './components/card_panel.dart';
 import './components/selection_panel.dart';
@@ -190,6 +191,16 @@ class _GamePageState extends State<GamePage> {
     return;
   }
 
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return HowToPlayDialog();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -225,7 +236,7 @@ class _GamePageState extends State<GamePage> {
                   _buildGameBoard(),
                   _buildPlayerPanel(
                     _buildPlayerInfo(widget.playerName, isMyTurn),
-                    _buildButton(Icons.text_snippet_outlined, howToPlay),
+                    _buildButton(Icons.text_snippet_outlined, _showMyDialog),
                   ),
                 ],
               ),
