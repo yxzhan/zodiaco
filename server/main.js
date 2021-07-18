@@ -125,16 +125,23 @@ wsServer.on('request', function (request) {
         break;
 
       case 'ready':
-        player.state = PLAYERSTATES.ready;
-        player.sendMsg({
-          'action': 'hint_update',
-          'data': 'Ready!'
-        })
-        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
-          'action': 'hint_update',
-          'data': `${player.name} is ready.`
-        })
-        DealCards(player);
+        if (player.opponent) {
+          player.state = PLAYERSTATES.ready;
+          player.sendMsg({
+            'action': 'hint_update',
+            'data': 'Ready!'
+          })
+          player.opponent.sendMsg({
+            'action': 'hint_update',
+            'data': `${player.name} is ready.`
+          })
+          DealCards(player);
+        } else {
+          player.sendMsg({
+            'action': 'hint_update',
+            'data': 'Opponent left the game!'
+          })
+        }
         break;
 
       // case 'ready':
@@ -165,7 +172,7 @@ wsServer.on('request', function (request) {
       // A player select a opponent's card
       //
       case 'select_card':
-        Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
+        player.opponent && player.opponent.sendMsg({
           'action': 'select_card',
           'data': message.data
         });
@@ -192,6 +199,9 @@ wsServer.on('request', function (request) {
   connection.on('close', function (connection) {
     // We need to remove the corresponding player
     console.log('Player left, id:', player.id)
+    player.opponent && player.opponent.sendMsg({
+      'action': 'resigned'
+    });
     Players = Players.filter(function (obj) {
       return obj.id !== player.id;
     });
@@ -208,8 +218,7 @@ function Player(id, connection) {
   this.id = id;
   this._connection = connection;
   this.name = "";
-  this.opponentIndex = null;
-  this.index = Players.length;
+  this.opponent = null;
   this.state = PLAYERSTATES.uninitialized;
   this.cards = [];
 }
@@ -225,15 +234,8 @@ Player.prototype = {
     this._connection && this._connection.sendUTF(JSON.stringify(msg))
   },
   setOpponent: function (id) {
-    var self = this;
-    Players.forEach(function (player, index) {
-      if (player.id == id) {
-        self.opponentIndex = index;
-        Players[index].opponentIndex = self.index;
-        return false;
-      }
-    });
-  }
+    this.opponent = Players.find(v => v.id === id)
+  },
 };
 
 // ---------------------------------------------------------
@@ -253,6 +255,14 @@ function BroadcastPlayersList() {
 // ---------------------------------------------------------
 function MatchPlayer(player) {
   player.state = PLAYERSTATES.matching;
+
+  if (player.opponent) {
+    player.opponent.opponent = null
+    // player.opponent.sendMsg({
+    //   'action': 'resigned'
+    // });
+  }
+
   let opponent = Players.find(p => p.state === PLAYERSTATES.matching && p.id !== player.id)
   if (!opponent) return
 
@@ -273,15 +283,15 @@ function MatchPlayer(player) {
 }
 
 function Resign(player) {
-  let opponent = Players[player.opponentIndex]
-  player.opponentIndex = null;
+  let opponent = player.opponent
+  player.opponent = null;
   clearInterval(player.counter)
 
   if (opponent) {
     opponent.sendMsg({
       'action': 'resigned'
     });
-    opponent.opponentIndex = null;
+    opponent.opponent = null;
     clearInterval(opponent.counter)
   }
 }
@@ -290,7 +300,7 @@ function Resign(player) {
 // Deal cards
 // ---------------------------------------------------------
 function DealCards(player) {
-  let opponent = Players[player.opponentIndex]
+  let opponent = player.opponent
   if (!opponent) return
 
   // wait until opponent ready
@@ -320,6 +330,15 @@ function DealCards(player) {
   player.cards = cards1
   opponent.cards = cards2
   updateCards(player, false)
+
+  player.sendMsg({
+    'action': 'select_card',
+    'data': '-1'
+  });
+  opponent.sendMsg({
+    'action': 'select_card',
+    'data': '-1'
+  });
 
   console.log('New Game')
   specialCardsreorder(player)
@@ -376,8 +395,15 @@ function DealCards(player) {
 // Ask players to place special cards to any position
 // ---------------------------------------------------------
 function specialCardsreorder(player) {
-  let opponent = Players[player.opponentIndex]
+  let opponent = player.opponent
   if (!opponent) return
+
+  _reorderControl(true)
+  let countDownSecond = REORDERCOUNTDOWN
+  let counter = setInterval(_countDown, 1000)
+  _countDown()
+  player.counter = counter
+  opponent.counter = counter
 
   function _reorderControl(val) {
     player.sendMsg({
@@ -390,12 +416,6 @@ function specialCardsreorder(player) {
       'data': val
     })
   }
-  _reorderControl(true)
-  let countDownSecond = REORDERCOUNTDOWN
-  let counter = setInterval(_countDown, 1000)
-  _countDown()
-  player.counter = counter
-  opponent.counter = counter
 
   function _countDown() {
     let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have them),
@@ -425,7 +445,7 @@ function specialCardsreorder(player) {
 // Check if game is over
 // ---------------------------------------------------------
 function checkGameover(player) {
-  let opponent = Players[player.opponentIndex]
+  let opponent = player.opponent
   if (!opponent) return
 
   // check if one of the player's cards are all unfolded
@@ -453,7 +473,7 @@ function checkGameover(player) {
       'action': 'hint_update',
       'data': 'You win!'
     })
-    Players[winner.opponentIndex].sendMsg({
+    winner.opponent.sendMsg({
       'action': 'hint_update',
       'data': 'You lost!'
     })
@@ -468,7 +488,7 @@ function checkGameover(player) {
 // Check guess result
 // ---------------------------------------------------------
 function switchTurn(player, turn) {
-  let opponent = Players[player.opponentIndex]
+  let opponent = player.opponent
   if (!opponent) return
   let turnHint = 'Your turn! Click opponent\'s card and guess the number.'
   let waitHint = '\'s turn.'
@@ -490,7 +510,7 @@ function switchTurn(player, turn) {
     'data': turn ? player.name + waitHint : turnHint
   })
 
-  Players[player.opponentIndex] && Players[player.opponentIndex].sendMsg({
+  opponent.sendMsg({
     'action': 'select_card',
     'data': '-1'
   });
@@ -501,7 +521,7 @@ function switchTurn(player, turn) {
 // Check guess result
 // ---------------------------------------------------------
 function checkGuess(player, data) {
-  let opponent = Players[player.opponentIndex]
+  let opponent = player.opponent
   if (!opponent) return
 
   let index = parseInt(data.split(',')[0])
@@ -556,7 +576,7 @@ function punish(player, data) {
 // Update cards display state
 // ---------------------------------------------------------
 function updateCards(player, displayOpponentCards = true) {
-  let opponent = Players[player.opponentIndex]
+  let opponent = player.opponent
   if (!opponent) return
   player.sendMsg({
     'action': 'cards_update',
