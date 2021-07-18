@@ -4,6 +4,7 @@ import '../networking/game_communication.dart';
 import './game_page.dart';
 import '../utils/utils.dart';
 import './components/loading_circle.dart';
+import 'how_to_play.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -188,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-
               //container for raised button
               Container(
                 width: 150,
@@ -213,9 +213,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 50,
                       width: 200,
                       child: GestureDetector(
-                        onTap: (
-                            //todo ad new page.......
-                            ) {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => HowToPlay()),
+                          );
+                        },
                         child: Text(
                           'HOW TO PLAY',
                           textAlign: TextAlign.center,
@@ -227,20 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      // child: Text(
-                      //   textAlign: TextAlign.center,
-                      //   decoration: InputDecoration(
-                      //     border: InputBorder.none,
-                      //     hintText: "HOW TO PLAY",
-                      //     hintStyle: TextStyle(
-                      //         fontFamily: 'Kefa',
-                      //         fontSize: 16.0,
-                      //         fontWeight: FontWeight.bold,
-                      //         color: Color.fromARGB(255, 223, 140, 0)),
-                      //     // contentPadding: EdgeInsets.symmetric(horizontal: (1))
-                      //   ),
-                      // ),
-                    )
+                    ),
                   ],
                 ),
               ),
