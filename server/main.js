@@ -139,7 +139,7 @@ wsServer.on('request', function (request) {
         } else {
           player.sendMsg({
             'action': 'hint_update',
-            'data': 'Opponent left the game!'
+            'data': 'The opponent left the game!'
           })
         }
         break;
@@ -284,6 +284,7 @@ function MatchPlayer(player) {
 
 function Resign(player) {
   let opponent = player.opponent
+  player.state = PLAYERSTATES.uninitialized;
   player.opponent = null;
   clearInterval(player.counter)
 
@@ -418,8 +419,8 @@ function specialCardsreorder(player) {
   }
 
   function _countDown() {
-    let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have them),
-    you can place them in any postion.
+    let hintText = `Long press your special Card \"${CARD_DISPLAY_STRING[SPECIALCARD]}\" to move them (if you have),
+    you can place them in any position.\n
     Game will started in ${countDownSecond} seconds.`
     // send hint to both player
     player.sendMsg({
@@ -544,7 +545,7 @@ function checkGuess(player, data) {
   } else {
     player.sendMsg({
       'action': 'hint_update',
-      'data': `Guessed wrong! That is not a ${CARD_DISPLAY_STRING[guessNum]}. Turn over one of your card.`
+      'data': `Guessed wrong! That is not a ${CARD_DISPLAY_STRING[guessNum]}. Turn over one of your cards.`
     })
 
     player.sendMsg({
