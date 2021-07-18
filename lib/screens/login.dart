@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './components/Button.dart';
+import './components/button.dart';
 import '../networking/game_communication.dart';
 import './game_page.dart';
 import '../utils/utils.dart';
@@ -57,15 +57,24 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'new_game':
         gameState = '';
         setState(() {});
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-              builder: (BuildContext context) => GamePage(
-                playerName: playerName, // Name of the opponent
-                opponentName: message["data"], // Name of the opponent
-              ),
-            ));
+        startNewGame(message["data"]);
         break;
+    }
+  }
+
+  void startNewGame(String opName) async {
+    final result = await Navigator.push(
+        context,
+        new MaterialPageRoute(
+          builder: (BuildContext context) => GamePage(
+            playerName: playerName, // Name of the opponent
+            opponentName: opName, // Name of the opponent
+          ),
+        ));
+    if (result == 'rematch') {
+      onPressed();
+    } else {
+      game.send('resign', '');
     }
   }
 

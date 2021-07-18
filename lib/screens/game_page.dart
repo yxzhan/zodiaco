@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:zodiaco/screens/components/Button.dart';
 import '../networking/game_communication.dart';
 import './components/card_panel.dart';
 import './components/selection_panel.dart';
@@ -41,7 +43,6 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void dispose() {
-    game.send('resign', '');
     game.removeListener(_onAction);
     super.dispose();
   }
@@ -57,7 +58,7 @@ class _GamePageState extends State<GamePage> {
       /// The opponent resigned, so let's leave this screen
       ///
       case 'resigned':
-        Navigator.of(context).pop();
+        Navigator.pop(context);
         break;
 
       ///
@@ -155,8 +156,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void rematchPlayer() {
-    Navigator.of(context).pop();
-    game.send('join', widget.playerName);
+    Navigator.pop(context, 'rematch');
   }
 
   void onReorder(int oldIndex, int newIndex) {
@@ -177,11 +177,20 @@ class _GamePageState extends State<GamePage> {
       body: SafeArea(
         child: Container(
           // color: GAMEBOARD_COLOR,
+          decoration: BoxDecoration(
+            // a background image
+            image: DecorationImage(
+              image: AssetImage(IMAGE_DIR + 'loginbg.png'),
+              // cover the entire screen -> a full background image
+              fit: BoxFit.cover,
+            ),
+          ),
           child: Center(
             child: Container(
               // TODO: change the game board size
               width: GAMEBOARD_MAX_WIDTH,
-              color: GAMEBOARD_COLOR,
+              // width: 400.0,
+              // color: GAMEBOARD_COLOR,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,24 +208,20 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget _buildPlayerInfo(String name, bool isPlaying) {
-    Widget playingSign = Container();
+    // Widget playingSign = Container();
+    Color color = Colors.grey;
     if (isPlaying) {
-      // playingSign = LoadingCircle(
-      //   size: 10.0,
-      //   duration: 2,
-      // );
-      playingSign = Text('\'s turn.');
+      // playingSign = Text('\'s turn');
+      color = Colors.white;
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.person),
-          Text(
-            name,
-          ),
-          playingSign
+          Icon(Icons.person, color: color),
+          Text(name, style: TextStyle(color: color)),
+          // playingSign
         ],
       ),
     );
@@ -231,22 +236,36 @@ class _GamePageState extends State<GamePage> {
             cardLists: opponentsCards,
             onTap: onCardTap,
             selectedCard: selfSelectedCard,
+            isMyTurn: isMyTurn,
             isMyCard: false,
             isReorderable: false,
+            isPunishing: isPunishing,
           ),
-          _buildSelectionPanel(),
-          _buildInstruction(),
-          _buildButtons(),
+          // TODO: wrap the three following widgets together
+          _buildInfoPanel(),
           CardPanel(
             cardLists: myCards,
             onTap: onCardTap,
             selectedCard: opponentSelectedCard,
+            isMyTurn: isMyTurn,
             isMyCard: true,
             isReorderable: isReorderable,
             onReorder: onReorder,
+            isPunishing: isPunishing,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoPanel() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildSelectionPanel(),
+        _buildInstruction(),
+        _buildButtons(),
+      ],
     );
   }
 
@@ -264,10 +283,11 @@ class _GamePageState extends State<GamePage> {
   Widget _buildInstruction() {
     return Container(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
         child: Text(
           gameHints,
           textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 20.0, color: Colors.white),
         ),
       ),
     );
@@ -276,15 +296,10 @@ class _GamePageState extends State<GamePage> {
   Widget _buildButtons() {
     if (showRestartButton) {
       return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ElevatedButton(
-            onPressed: restartGame,
-            child: new Text('Play Again'),
-          ),
-          ElevatedButton(
-            onPressed: rematchPlayer,
-            child: new Text('Match other player'),
-          )
+          Button(text: 'Play Again', onPressed: restartGame),
+          Button(text: 'Next Game', onPressed: rematchPlayer),
         ],
       );
     }
@@ -292,10 +307,7 @@ class _GamePageState extends State<GamePage> {
       return Container();
     }
     return Container(
-      child: ElevatedButton(
-        onPressed: skipRound,
-        child: new Text('Skip'),
-      ),
+      child: Button(text: 'Skip', onPressed: skipRound),
     );
   }
 }
