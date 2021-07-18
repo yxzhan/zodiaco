@@ -39,7 +39,7 @@ class SelectionPanel extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
     double cardWidth = min(screenWidth, GAMEBOARD_MAX_WIDTH) * 0.12;
 
-    // double cardHeight = cardWidth * 1.2;
+    double cardHeight = cardWidth * 1.2;
 
     String imageDir = CARDS_UI_DIR + 'b';
     if (cardLists[selectedCard]['color'] == 'black') {
