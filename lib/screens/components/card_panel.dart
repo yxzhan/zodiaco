@@ -126,7 +126,7 @@ class _CardPanelState extends State<CardPanel> {
       double cardRotation = 0.8;
       double scale = 1;
       Border borderStyle;
-      imageNumber = widget.cardLists[i]['display_str'];
+      imageNumber = widget.cardLists[i]['value'].toString();
 
       // style of cards are open
       if (widget.cardLists[i]['show'] == 1 || widget.isReorderable) {

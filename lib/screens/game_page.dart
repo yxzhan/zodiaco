@@ -58,7 +58,21 @@ class _GamePageState extends State<GamePage> {
       /// The opponent resigned, so let's leave this screen
       ///
       case 'resigned':
-        Navigator.pop(context);
+        showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Player Left!'),
+                  content: Text(widget.opponentName + ' left the game.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ));
         break;
 
       ///
@@ -175,6 +189,7 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(38, 50, 56, 1),
       // appBar: AppBar(
       //   title: Text('GameBoard'),
       // ),
