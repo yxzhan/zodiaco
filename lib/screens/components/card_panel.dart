@@ -95,16 +95,11 @@ class _CardPanelState extends State<CardPanel> {
         spacing: 16.0,
         runSpacing: 8.0,
         // padding: const EdgeInsets.all(8),
-        crossAxisAlignment: WrapCrossAlignment.center,
+        alignment: WrapAlignment.center,
         onReorder: widget.onReorder,
         children: _buildCards(),
       );
     } else {
-      // TODO: effect
-      // if (widget.isMyTurn){
-      //   Widget background;
-      // }
-
       return Wrap(
         spacing: 16.0,
         runSpacing: 8.0,
