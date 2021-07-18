@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../utils/configs.dart';
 import 'package:reorderables/reorderables.dart';
+import 'dart:math';
 
 class CardPanel extends StatefulWidget {
   final List<dynamic> cardLists;
@@ -115,8 +116,9 @@ class _CardPanelState extends State<CardPanel> {
   }
 
   List<Widget> _buildCards() {
-    double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
-    double cardHeight = cardWidth * 1.3;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardWidth = min(screenWidth, GAMEBOARD_MAX_WIDTH) * 0.12;
+    // double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
     String imageDir;
     String imageNumber;
