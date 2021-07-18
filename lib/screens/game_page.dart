@@ -61,16 +61,18 @@ class _GamePageState extends State<GamePage> {
         showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-                  title: const Text('AlertDialog Title'),
-                  content: const Text('AlertDialog description'),
+                  title: const Text('Player Left!'),
+                  content: Text(widget.opponentName + ' left the game.'),
                   actions: <Widget>[
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
                       child: const Text('OK'),
                     ),
                   ],
                 ));
-        // Navigator.pop(context);
         break;
 
       ///
