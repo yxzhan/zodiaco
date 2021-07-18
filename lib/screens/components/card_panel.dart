@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../utils/configs.dart';
 import 'package:reorderables/reorderables.dart';
+import 'dart:math';
 
 class CardPanel extends StatefulWidget {
   final List<dynamic> cardLists;
@@ -95,16 +96,11 @@ class _CardPanelState extends State<CardPanel> {
         spacing: 16.0,
         runSpacing: 8.0,
         // padding: const EdgeInsets.all(8),
-        crossAxisAlignment: WrapCrossAlignment.center,
+        alignment: WrapAlignment.center,
         onReorder: widget.onReorder,
         children: _buildCards(),
       );
     } else {
-      // TODO: effect
-      // if (widget.isMyTurn){
-      //   Widget background;
-      // }
-
       return Wrap(
         spacing: 16.0,
         runSpacing: 8.0,
@@ -115,8 +111,9 @@ class _CardPanelState extends State<CardPanel> {
   }
 
   List<Widget> _buildCards() {
-    double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
-    double cardHeight = cardWidth * 1.3;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardWidth = min(screenWidth, GAMEBOARD_MAX_WIDTH) * 0.12;
+    // double cardHeight = cardWidth * 1.3;
     List<Widget> res = [];
     String imageDir;
     String imageNumber;
@@ -126,7 +123,7 @@ class _CardPanelState extends State<CardPanel> {
       double cardRotation = 0.8;
       double scale = 1;
       Border borderStyle;
-      imageNumber = widget.cardLists[i]['display_str'];
+      imageNumber = widget.cardLists[i]['value'].toString();
 
       // style of cards are open
       if (widget.cardLists[i]['show'] == 1 || widget.isReorderable) {

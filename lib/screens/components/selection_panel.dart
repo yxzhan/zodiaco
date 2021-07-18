@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/configs.dart';
+import 'dart:math';
 
 class SelectionPanel extends StatelessWidget {
   final int selectedCard;
@@ -34,7 +35,10 @@ class SelectionPanel extends StatelessWidget {
   }
 
   List<Widget> _buildCards(BuildContext context) {
-    double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
+    // double cardWidth = GAMEBOARD_MAX_WIDTH * 0.12;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardWidth = min(screenWidth, GAMEBOARD_MAX_WIDTH) * 0.12;
+
     double cardHeight = cardWidth * 1.2;
 
     String imageDir = CARDS_UI_DIR + 'b';

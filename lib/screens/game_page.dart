@@ -58,7 +58,21 @@ class _GamePageState extends State<GamePage> {
       /// The opponent resigned, so let's leave this screen
       ///
       case 'resigned':
-        Navigator.pop(context);
+        showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Player Left!'),
+                  content: Text(widget.opponentName + ' left the game.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ));
         break;
 
       ///
@@ -172,9 +186,14 @@ class _GamePageState extends State<GamePage> {
     Navigator.pop(context);
   }
 
+  void howToPlay() {
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(38, 50, 56, 1),
       // appBar: AppBar(
       //   title: Text('GameBoard'),
       // ),
@@ -199,19 +218,15 @@ class _GamePageState extends State<GamePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _buildPlayerInfo(
-                    widget.opponentName,
-                    !isMyTurn,
-                    _buildQuitButton(),
-                    Container(),
+                  _buildPlayerPanel(
+                    _buildButton(Icons.arrow_back, quitGame),
+                    _buildPlayerInfo(widget.opponentName, isMyTurn),
                   ),
                   _buildGameBoard(),
-                  _buildPlayerInfo(
-                    widget.playerName,
-                    isMyTurn,
-                    Container(),
-                    _buildQuitButton(),
-                  )
+                  _buildPlayerPanel(
+                    _buildPlayerInfo(widget.playerName, isMyTurn),
+                    _buildButton(Icons.text_snippet_outlined, howToPlay),
+                  ),
                 ],
               ),
             ),
@@ -221,40 +236,48 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Widget _buildPlayerInfo(
-      String name, bool isPlaying, Widget leftWidget, Widget rightWidget) {
-    // Widget playingSign = Container();
-    Color color = Colors.grey;
-    if (isPlaying) {
-      // playingSign = Text('\'s turn');
-      color = Colors.white;
-    }
+  Widget _buildPlayerPanel(Widget leftWidget, Widget rightWidget) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           leftWidget,
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Icon(Icons.person, color: color),
-              Text(name, style: TextStyle(color: color)),
-              // playingSign
-            ],
-          ),
           rightWidget,
         ],
       ),
     );
   }
 
-  Widget _buildQuitButton() {
+  Widget _buildPlayerInfo(String name, bool isPlaying) {
+    Color color = Colors.white24;
+    if (isPlaying) {
+      color = Colors.white;
+    }
+
+    return Row(
+      // mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Icon(Icons.person, color: color),
+        Text(
+          name,
+          style: TextStyle(
+            fontFamily: 'Kefa',
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButton(IconData iconData, Function onPressed) {
     return IconButton(
-      onPressed: quitGame,
+      onPressed: onPressed,
       constraints: BoxConstraints(),
       // remove all the padding
-      icon: Icon(Icons.arrow_back),
+      icon: Icon(iconData),
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
     );
@@ -319,7 +342,12 @@ class _GamePageState extends State<GamePage> {
         child: Text(
           gameHints,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20.0, color: Colors.white),
+          style: TextStyle(
+            fontFamily: 'Kefa',
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );
