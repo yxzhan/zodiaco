@@ -62,8 +62,21 @@ class _GamePageState extends State<GamePage> {
         showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Player Left!'),
-                  content: Text(widget.opponentName + ' left the game.'),
+                  title: const Text(
+                    'Player Left!',
+                    style: TextStyle(
+                      fontFamily: 'Kefa',
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 223, 140, 0),
+                    ),
+                  ),
+                  content: Text(
+                    widget.opponentName + ' left the game.',
+                    style: TextStyle(
+                      fontFamily: 'Kefa',
+                      color: Color.fromARGB(255, 223, 140, 0),
+                    ),
+                  ),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
